@@ -1,12 +1,14 @@
 package ua.zhenya.todo.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.zhenya.todo.dto.UserCreateDTO;
-import ua.zhenya.todo.dto.UserReadDTO;
-import ua.zhenya.todo.dto.UserUpdateDTO;
+import ua.zhenya.todo.dto.user.UserCreateDTO;
+import ua.zhenya.todo.dto.user.UserReadDTO;
+import ua.zhenya.todo.dto.user.UserUpdateDTO;
 import ua.zhenya.todo.mappers.UserCreateMapper;
 import ua.zhenya.todo.mappers.UserReadMapper;
 import ua.zhenya.todo.mappers.UserUpdateMapper;
@@ -14,7 +16,6 @@ import ua.zhenya.todo.model.Role;
 import ua.zhenya.todo.repository.RoleRepository;
 import ua.zhenya.todo.repository.UserRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,16 +30,15 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
 
-    public List<UserReadDTO> findAll() {
-        return userRepository.findAll()
-                .stream().map(userReadMapper::map)
-                .toList();
+    public Page<UserReadDTO> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable)
+                .map(userReadMapper::map);
     }
 
     @Transactional
     public UserReadDTO create(UserCreateDTO user) {
         if (!user.getPassword().equals(user.getConfirmPassword()))
-            throw new IllegalArgumentException("Passwords do not match");
+            throw new IllegalArgumentException("Пароли не совпадают");
 
         return Optional.of(user)
                 .map(userCreateMapper::map)

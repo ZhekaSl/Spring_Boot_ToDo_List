@@ -1,16 +1,17 @@
 package ua.zhenya.todo.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import ua.zhenya.todo.dto.UserCreateDTO;
-import ua.zhenya.todo.dto.UserUpdateDTO;
-import ua.zhenya.todo.dto.UserReadDTO;
+import ua.zhenya.todo.dto.PageResponse;
+import ua.zhenya.todo.dto.user.UserCreateDTO;
+import ua.zhenya.todo.dto.user.UserReadDTO;
+import ua.zhenya.todo.dto.user.UserUpdateDTO;
 import ua.zhenya.todo.service.UserService;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,9 +20,9 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public List<UserReadDTO> findAll() {
-        return userService.findAll();
-
+    public PageResponse<UserReadDTO> findAll(Pageable pageable) {
+        Page<UserReadDTO> page = userService.findAll(pageable);
+        return PageResponse.of(page);
     }
 
     @GetMapping("/{id}")

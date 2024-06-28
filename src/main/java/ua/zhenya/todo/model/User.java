@@ -26,7 +26,7 @@ public class User implements BaseEntity<Integer>, UserDetails {
     private String password;
     private String firstname;
     private LocalDate birthDate;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Task> tasks = new ArrayList<>();
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles",

@@ -1,7 +1,7 @@
 package ua.zhenya.todo.mappers;
 
 import org.springframework.stereotype.Component;
-import ua.zhenya.todo.dto.UserReadDTO;
+import ua.zhenya.todo.dto.user.UserReadDTO;
 import ua.zhenya.todo.model.User;
 
 @Component

@@ -40,5 +40,4 @@ public class Task implements BaseEntity<Integer> {
 
     @OneToMany(mappedBy = "parentTask", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Task> subtasks = new ArrayList<>();
-
 }

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import ua.zhenya.todo.dto.UserCreateDTO;
+import ua.zhenya.todo.dto.user.UserCreateDTO;
 import ua.zhenya.todo.model.User;
 
 import java.util.Optional;

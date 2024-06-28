@@ -1,4 +1,4 @@
-package ua.zhenya.todo.dto;
+package ua.zhenya.todo.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
