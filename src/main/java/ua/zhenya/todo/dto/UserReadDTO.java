@@ -13,5 +13,4 @@ public class UserReadDTO {
     String username;
     String firstname;
     LocalDate birthDate;
-    LocalDateTime registeredAt;
 }

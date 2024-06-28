@@ -33,12 +33,7 @@ public class User implements BaseEntity<Integer>, UserDetails {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
-    private LocalDateTime registeredAt;
 
-    @PrePersist
-    private void init() {
-        this.registeredAt = LocalDateTime.now();
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

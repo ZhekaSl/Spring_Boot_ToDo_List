@@ -23,9 +23,9 @@ public class Task implements BaseEntity<Integer> {
 
     private String name;
     private String description;
-    private LocalDateTime dueDate;
-    private boolean isCompleted;
-    private LocalDateTime completedDateTime;
+    private LocalDateTime targetDate;
+    private boolean completed;
+    private LocalDateTime completedDate;
 
     @Enumerated(EnumType.STRING)
     private Priority priority;

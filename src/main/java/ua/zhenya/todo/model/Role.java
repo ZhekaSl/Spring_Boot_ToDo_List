@@ -9,10 +9,10 @@ import org.springframework.security.core.GrantedAuthority;
 @Table(name = "roles")
 @Data
 @NoArgsConstructor
-public class Role implements GrantedAuthority {
+public class Role implements GrantedAuthority, BaseEntity<Short> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Short id;
     private String name;
 
     @Override
