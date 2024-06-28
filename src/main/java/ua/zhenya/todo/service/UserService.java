@@ -1,15 +1,16 @@
 package ua.zhenya.todo.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestMapping;
-import ua.zhenya.todo.dto.UserCreateDto;
+import ua.zhenya.todo.dto.UserCreateDTO;
 import ua.zhenya.todo.dto.UserReadDTO;
+import ua.zhenya.todo.dto.UserUpdateDTO;
 import ua.zhenya.todo.mappers.UserCreateMapper;
 import ua.zhenya.todo.mappers.UserReadMapper;
+import ua.zhenya.todo.mappers.UserUpdateMapper;
 import ua.zhenya.todo.model.Role;
-import ua.zhenya.todo.model.User;
 import ua.zhenya.todo.repository.RoleRepository;
 import ua.zhenya.todo.repository.UserRepository;
 
@@ -23,7 +24,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserReadMapper userReadMapper;
     private final UserCreateMapper userCreateMapper;
+    private final UserUpdateMapper userUpdateMapper;
     private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     public List<UserReadDTO> findAll() {
@@ -33,7 +36,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserReadDTO create(UserCreateDto user) {
+    public UserReadDTO create(UserCreateDTO user) {
         if (!user.getPassword().equals(user.getConfirmPassword()))
             throw new IllegalArgumentException("Passwords do not match");
 
@@ -53,7 +56,29 @@ public class UserService {
                 .map(userReadMapper::map);
     }
 
-    public User update(Integer id, UserCreateDto user) {
-        return null;
+    @Transactional
+    public Optional<UserReadDTO> update(Integer id, UserUpdateDTO userDTO) {
+        return userRepository.findById(id)
+                .map(foundUser -> {
+                    if (!passwordEncoder.matches(userDTO.getOldPassword(), foundUser.getPassword())) {
+                        throw new IllegalArgumentException("Неверный старый пароль!");
+                    }
+                    userUpdateMapper.map(userDTO, foundUser);
+                    return foundUser;
+                })
+                .map(userRepository::saveAndFlush)
+                .map(userReadMapper::map);
+    }
+
+    @Transactional
+    public boolean delete(Integer id) {
+        return userRepository.findById(id)
+                .map(entity -> {
+                    userRepository.delete(entity);
+                    userRepository.flush();
+                    return true;
+                })
+                .orElse(false);
+
     }
 }

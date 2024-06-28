@@ -2,13 +2,12 @@ package ua.zhenya.todo.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import ua.zhenya.todo.dto.UserCreateDto;
+import ua.zhenya.todo.dto.UserCreateDTO;
+import ua.zhenya.todo.dto.UserUpdateDTO;
 import ua.zhenya.todo.dto.UserReadDTO;
-import ua.zhenya.todo.model.User;
 import ua.zhenya.todo.service.UserService;
 
 import java.util.List;
@@ -33,17 +32,24 @@ public class UserController {
 
     @PostMapping(value = "/registration")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserReadDTO create(@RequestBody UserCreateDto user) {
+    public UserReadDTO create(@RequestBody UserCreateDTO user) {
         return userService.create(user);
     }
 
+
     @PutMapping("/{id}")
-    public UserReadDTO update(@PathVariable Integer id, @RequestBody UserCreateDto user) {
-        return null;
+    @ResponseStatus(HttpStatus.OK)
+    public UserReadDTO update(@PathVariable Integer id,
+                              @RequestBody UserUpdateDTO userDTO) {
+        return userService.update(id,userDTO)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Integer id) {
+    public ResponseEntity<?> delete(@PathVariable Integer id) {
+        return userService.delete(id)
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
 
     }
 }
