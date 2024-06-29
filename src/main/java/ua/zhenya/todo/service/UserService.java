@@ -9,9 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 import ua.zhenya.todo.dto.user.UserCreateDTO;
 import ua.zhenya.todo.dto.user.UserReadDTO;
 import ua.zhenya.todo.dto.user.UserUpdateDTO;
-import ua.zhenya.todo.mappers.UserCreateMapper;
-import ua.zhenya.todo.mappers.UserReadMapper;
-import ua.zhenya.todo.mappers.UserUpdateMapper;
+import ua.zhenya.todo.mappers.user.UserCreateMapper;
+import ua.zhenya.todo.mappers.user.UserReadMapper;
+import ua.zhenya.todo.mappers.user.UserUpdateMapper;
 import ua.zhenya.todo.model.Role;
 import ua.zhenya.todo.repository.RoleRepository;
 import ua.zhenya.todo.repository.UserRepository;
@@ -79,6 +79,6 @@ public class UserService {
                     return true;
                 })
                 .orElse(false);
-
     }
+
 }

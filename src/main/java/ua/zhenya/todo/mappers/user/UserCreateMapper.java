@@ -1,41 +1,45 @@
-package ua.zhenya.todo.mappers;
+package ua.zhenya.todo.mappers.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import ua.zhenya.todo.dto.user.UserUpdateDTO;
+import ua.zhenya.todo.dto.user.UserCreateDTO;
+import ua.zhenya.todo.mappers.Mapper;
 import ua.zhenya.todo.model.User;
 
 import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class UserUpdateMapper implements Mapper<UserUpdateDTO, User> {
+public class UserCreateMapper implements Mapper<UserCreateDTO, User> {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public User map(UserUpdateDTO object) {
+    public User map(UserCreateDTO object) {
         User user = new User();
-
         copy(object, user);
+
         return user;
     }
 
-    private void copy(UserUpdateDTO dto, User user) {
+    private void copy(UserCreateDTO dto, User user) {
         user.setUsername(dto.getUsername());
         user.setFirstname(dto.getFirstName());
         user.setBirthDate(dto.getBirthDate());
 
-        Optional.ofNullable(dto.getNewPassword())
+        Optional.ofNullable(dto.getPassword())
                 .filter(StringUtils::hasText)
                 .map(passwordEncoder::encode)
                 .ifPresent(user::setPassword);
     }
 
     @Override
-    public User map(UserUpdateDTO fromObject, User toObject) {
-        copy(fromObject, toObject);
+    public User map(UserCreateDTO formObject, User toObject) {
+        copy(formObject, toObject);
         return toObject;
     }
+
+
+
 }

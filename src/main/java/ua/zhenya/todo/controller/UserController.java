@@ -8,9 +8,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ua.zhenya.todo.dto.PageResponse;
+import ua.zhenya.todo.dto.task.TaskReadDTO;
 import ua.zhenya.todo.dto.user.UserCreateDTO;
 import ua.zhenya.todo.dto.user.UserReadDTO;
 import ua.zhenya.todo.dto.user.UserUpdateDTO;
+import ua.zhenya.todo.service.TaskService;
 import ua.zhenya.todo.service.UserService;
 
 @RestController
@@ -18,6 +20,7 @@ import ua.zhenya.todo.service.UserService;
 @RequestMapping("/api/v1/users")
 public class UserController {
     private final UserService userService;
+    private final TaskService taskService;
 
     @GetMapping
     public PageResponse<UserReadDTO> findAll(Pageable pageable) {
