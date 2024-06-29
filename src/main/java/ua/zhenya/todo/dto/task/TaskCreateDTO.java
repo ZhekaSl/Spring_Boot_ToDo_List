@@ -1,20 +1,19 @@
 package ua.zhenya.todo.dto.task;
 
+import lombok.Value;
 import ua.zhenya.todo.model.Priority;
 import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.model.User;
 
 import java.time.LocalDateTime;
 
+@Value
 public class TaskCreateDTO {
-    private String name;
-    private String description;
-    private LocalDateTime targetDate;
-    private LocalDateTime completedDate;
+    String name;
+    String description;
+    LocalDateTime targetDate;
 
-    private Priority priority;
+    Priority priority;
 
-    private Task parentTask;
-
-    private User user;
+    Integer userId;
 }

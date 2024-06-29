@@ -20,7 +20,6 @@ import ua.zhenya.todo.service.UserService;
 @RequestMapping("/api/v1/users")
 public class UserController {
     private final UserService userService;
-    private final TaskService taskService;
 
     @GetMapping
     public PageResponse<UserReadDTO> findAll(Pageable pageable) {
