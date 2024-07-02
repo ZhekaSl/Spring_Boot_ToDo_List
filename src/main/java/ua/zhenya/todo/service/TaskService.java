@@ -26,8 +26,7 @@ public class TaskService {
     private final UserService userService;
 
     public Task findById(Principal principal, Integer id) {
-        String userUsername = principal.getName();
-        User user = userService.findByUsername(userUsername);
+        User user = userService.findByUsername(principal.getName());
 
         return taskRepository.findById(id)
                 .map(task -> {
@@ -41,28 +40,31 @@ public class TaskService {
 
 
     public Page<Task> findAll(Principal principal, Pageable pageable) {
-        String userUsername = principal.getName();
-        User user = userService.findByUsername(userUsername);
+        User user = userService.findByUsername(principal.getName());
 
         return taskRepository.findAllByUserIdAndParentTaskIsNull(user.getId(), pageable);
     }
 
     @Transactional
     public Task create(Principal principal, Task task) {
-        String userUsername = principal.getName();
-        User user = userService.findByUsername(userUsername);
+        User user = userService.findByUsername(principal.getName());
         task.setUser(user);
         return taskRepository.save(task);
     }
 
     @Transactional
     public boolean delete(Principal principal, Integer id) {
+        User user = userService.findByUsername(principal.getName());
+
         return taskRepository.findById(id)
-                .map(entity -> {
-                    taskRepository.delete(entity);
+                .map(task -> {
+                    if (!task.getUser().getId().equals(user.getId())) {
+                        throw new UnsupportedOperationException("Вы не можете удалить эту задачу!");
+                    }
+                    taskRepository.delete(task);
                     taskRepository.flush();
                     return true;
                 })
-                .orElse(false);
+                .orElseThrow(() -> new IllegalArgumentException("Задача с id: " + id + " не найдена!"));
     }
 }

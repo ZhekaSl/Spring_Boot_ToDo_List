@@ -35,7 +35,7 @@ public class TaskController {
     @GetMapping("/{id}")
     public ResponseEntity<TaskReadDTO> findById(Principal principal, @PathVariable Integer id) {
         TaskReadDTO taskReadDTO = taskReadMapper
-                .map(taskService.findById(principal,id));
+                .map(taskService.findById(principal, id));
 
         return ResponseEntity.ok(taskReadDTO);
     }
@@ -46,6 +46,13 @@ public class TaskController {
         Task task = taskCreateMapper.map(taskCreateDTO);
         taskService.create(principal, task);
         return ResponseEntity.ok(taskReadMapper.map(task));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(Principal principal, @PathVariable Integer id) {
+        return taskService.delete(principal, id)
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
     }
 
 }
