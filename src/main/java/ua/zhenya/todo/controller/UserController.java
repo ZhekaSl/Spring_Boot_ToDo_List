@@ -8,34 +8,39 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ua.zhenya.todo.dto.PageResponse;
-import ua.zhenya.todo.dto.task.TaskReadDTO;
-import ua.zhenya.todo.dto.user.UserCreateDTO;
+import ua.zhenya.todo.dto.user.RegistrationUserDTO;
 import ua.zhenya.todo.dto.user.UserReadDTO;
 import ua.zhenya.todo.dto.user.UserUpdateDTO;
-import ua.zhenya.todo.service.TaskService;
+import ua.zhenya.todo.mappers.user.UserCreateMapper;
+import ua.zhenya.todo.mappers.user.UserReadMapper;
 import ua.zhenya.todo.service.UserService;
+
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
 public class UserController {
     private final UserService userService;
+    private final UserReadMapper userReadMapper;
+    private final UserCreateMapper userCreateMapper;
 
     @GetMapping
     public PageResponse<UserReadDTO> findAll(Pageable pageable) {
-        Page<UserReadDTO> page = userService.findAll(pageable);
+        Page<UserReadDTO> page = userService.findAll(pageable)
+                .map(userReadMapper::map);
         return PageResponse.of(page);
     }
 
     @GetMapping("/{id}")
-    public UserReadDTO findById(@PathVariable Integer id) {
-        return userService.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    public ResponseEntity<UserReadDTO> findById(@PathVariable Integer id) {
+        UserReadDTO userReadDTO = userReadMapper.map(userService.findById(id));
+        return ResponseEntity.ok(userReadDTO);
     }
 
     @PostMapping(value = "/registration")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserReadDTO create(@RequestBody UserCreateDTO user) {
+    public UserReadDTO create(@RequestBody RegistrationUserDTO user) {
         return userService.create(user);
     }
 
@@ -44,7 +49,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public UserReadDTO update(@PathVariable Integer id,
                               @RequestBody UserUpdateDTO userDTO) {
-        return userService.update(id,userDTO)
+        return userService.update(id, userDTO)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 

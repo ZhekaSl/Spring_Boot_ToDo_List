@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,13 +45,11 @@ public class AuthService {
         if (!registrationUserDTO.getPassword().equals(registrationUserDTO.getConfirmPassword())) {
             return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), "Пароли не совпадают!"), HttpStatus.BAD_REQUEST);
         }
-
-        if (userService.findByUsername(registrationUserDTO.getUsername()).isPresent()) {
+        try {
+            userService.findByUsername(registrationUserDTO.getUsername());
             return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), "Пользователь с указанным именем уже существует!"), HttpStatus.BAD_REQUEST);
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.ok(userService.create(registrationUserDTO));
         }
-
-        return ResponseEntity.ok(userService.create(registrationUserDTO));
     }
-
-
 }

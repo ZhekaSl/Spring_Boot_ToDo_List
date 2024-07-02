@@ -3,15 +3,19 @@ package ua.zhenya.todo.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.zhenya.todo.dto.PageResponse;
 import ua.zhenya.todo.dto.task.TaskCreateDTO;
 import ua.zhenya.todo.dto.task.TaskReadDTO;
 import ua.zhenya.todo.mappers.task.TaskCreateMapper;
 import ua.zhenya.todo.mappers.task.TaskReadMapper;
+import ua.zhenya.todo.mappers.user.UserCreateMapper;
+import ua.zhenya.todo.model.Task;
+import ua.zhenya.todo.model.User;
 import ua.zhenya.todo.repository.TaskRepository;
 
+import java.security.Principal;
 import java.util.Optional;
 
 @Service
@@ -19,34 +23,35 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
-    private final TaskReadMapper taskReadMapper;
+    private final UserService userService;
 
-    private final TaskCreateMapper taskCreateMapper;
+    public Task findById(Principal principal, Integer id) {
+        String userUsername = principal.getName();
+        User user = userService.findByUsername(userUsername);
 
-    public Page<TaskReadDTO> findAll(Pageable pageable) {
-        return taskRepository.findAll(pageable)
-                .map(taskReadMapper::map);
-    }
-
-    public Optional<TaskReadDTO> findById(Integer id) {
         return taskRepository.findById(id)
-                .map(taskReadMapper::map);
-
+                .map(task -> {
+                    if (!task.getUser().getId().equals(user.getId())) {
+                        throw new IllegalArgumentException("Задача с id:" + id + " не принадлежит текущему пользователю!");
+                    }
+                    return task;
+                })
+                .orElseThrow(() -> new IllegalArgumentException("Задача с id:" + id + " не найдена!"));
     }
 
-    public Page<TaskReadDTO> findAllByUserId(Integer userId, Pageable pageable) {
-        return taskRepository.findAllByUserIdAndParentTaskIsNull(userId, pageable)
-                .map(taskReadMapper::map);
 
+    public Page<Task> findAll(Principal principal, Pageable pageable) {
+        String userUsername = principal.getName();
+        User user = userService.findByUsername(userUsername);
 
+        return taskRepository.findAllByUserIdAndParentTaskIsNull(user.getId(), pageable);
     }
+
     @Transactional
-    public TaskReadDTO create(TaskCreateDTO taskDTO) {
-        return Optional.of(taskDTO)
-                .map(taskCreateMapper::map)
-                .map(taskRepository::save)
-                .map(taskReadMapper::map)
-                .orElseThrow();
-
+    public Task create(Principal principal, Task task) {
+        String userUsername = principal.getName();
+        User user = userService.findByUsername(userUsername);
+        task.setUser(user);
+        return taskRepository.save(task);
     }
 }

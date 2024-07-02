@@ -10,38 +10,42 @@ import org.springframework.web.server.ResponseStatusException;
 import ua.zhenya.todo.dto.PageResponse;
 import ua.zhenya.todo.dto.task.TaskCreateDTO;
 import ua.zhenya.todo.dto.task.TaskReadDTO;
+import ua.zhenya.todo.mappers.task.TaskCreateMapper;
+import ua.zhenya.todo.mappers.task.TaskReadMapper;
+import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.service.TaskService;
+
+import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/tasks")
 public class TaskController {
     private final TaskService taskService;
+    private final TaskReadMapper taskReadMapper;
+    private final TaskCreateMapper taskCreateMapper;
 
     @GetMapping
-    public PageResponse<TaskReadDTO> findAll(Pageable pageable) {
-        Page<TaskReadDTO> page = taskService.findAll(pageable);
-        return PageResponse.of(page);
-
-    }
-
-    @GetMapping("/users/{userId}/tasks")
-    public PageResponse<TaskReadDTO> findAllByUserId(@PathVariable Integer userId, Pageable pageable) {
-        Page<TaskReadDTO> page = taskService.findAllByUserId(userId, pageable);
+    public PageResponse<TaskReadDTO> findAll(Principal principal, Pageable pageable) {
+        Page<TaskReadDTO> page = taskService.findAll(principal, pageable)
+                .map(taskReadMapper::map);
         return PageResponse.of(page);
     }
 
     @GetMapping("/{id}")
-    public TaskReadDTO findById(@PathVariable Integer id) {
-        return taskService.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    public ResponseEntity<TaskReadDTO> findById(Principal principal, @PathVariable Integer id) {
+        TaskReadDTO taskReadDTO = taskReadMapper
+                .map(taskService.findById(principal,id));
+
+        return ResponseEntity.ok(taskReadDTO);
     }
+
 
     @PostMapping
-    public TaskReadDTO create(@RequestBody TaskCreateDTO taskCreateDTO) {
-       return taskService.create(taskCreateDTO);
+    public ResponseEntity<TaskReadDTO> create(Principal principal, @RequestBody TaskCreateDTO taskCreateDTO) {
+        Task task = taskCreateMapper.map(taskCreateDTO);
+        taskService.create(principal, task);
+        return ResponseEntity.ok(taskReadMapper.map(task));
     }
-
-
 
 }

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import ua.zhenya.todo.dto.user.UserCreateDTO;
+import ua.zhenya.todo.dto.user.RegistrationUserDTO;
 import ua.zhenya.todo.mappers.Mapper;
 import ua.zhenya.todo.model.User;
 
@@ -12,18 +12,18 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class UserCreateMapper implements Mapper<UserCreateDTO, User> {
+public class UserCreateMapper implements Mapper<RegistrationUserDTO, User> {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public User map(UserCreateDTO object) {
+    public User map(RegistrationUserDTO object) {
         User user = new User();
         copy(object, user);
 
         return user;
     }
 
-    private void copy(UserCreateDTO dto, User user) {
+    private void copy(RegistrationUserDTO dto, User user) {
         user.setUsername(dto.getUsername());
         user.setFirstname(dto.getFirstName());
         user.setBirthDate(dto.getBirthDate());
@@ -35,7 +35,7 @@ public class UserCreateMapper implements Mapper<UserCreateDTO, User> {
     }
 
     @Override
-    public User map(UserCreateDTO formObject, User toObject) {
+    public User map(RegistrationUserDTO formObject, User toObject) {
         copy(formObject, toObject);
         return toObject;
     }

@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ua.zhenya.todo.dto.user.LoginUserDTO;
 import ua.zhenya.todo.dto.user.RegistrationUserDTO;
 import ua.zhenya.todo.service.AuthService;
-import ua.zhenya.todo.service.UserService;
 
 @RestController
 @RequiredArgsConstructor
