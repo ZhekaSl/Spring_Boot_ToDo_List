@@ -24,7 +24,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final UserReadMapper userReadMapper;
     private final UserCreateMapper userCreateMapper;
     private final UserUpdateMapper userUpdateMapper;
     private final RoleService roleService;
@@ -37,11 +36,11 @@ public class UserService {
 
     public User findById(Integer id) {
         return userRepository.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("Пользователь с id: " + id + " не найден!"));
+                .orElseThrow(() -> new IllegalArgumentException("Пользователь с id: " + id + " не найден!"));
     }
 
     @Transactional
-    public UserReadDTO create(RegistrationUserDTO user) {
+    public User create(RegistrationUserDTO user) {
         if (!user.getPassword().equals(user.getConfirmPassword()))
             throw new IllegalArgumentException("Пароли не совпадают");
 
@@ -52,8 +51,7 @@ public class UserService {
                     u.getRoles().add(userRole);
                     return userRepository.save(u);
                 })
-                .map(userReadMapper::map)
-                .orElseThrow();
+                .orElseThrow(() -> new IllegalArgumentException("Ошибка при создании пользователя!"));
     }
 
     public User findByUsername(String username) {
@@ -63,7 +61,7 @@ public class UserService {
 
 
     @Transactional
-    public Optional<UserReadDTO> update(Integer id, UserUpdateDTO userDTO) {
+    public User update(Integer id, UserUpdateDTO userDTO) {
         return userRepository.findById(id)
                 .map(foundUser -> {
                     if (!passwordEncoder.matches(userDTO.getOldPassword(), foundUser.getPassword())) {
@@ -72,8 +70,8 @@ public class UserService {
                     userUpdateMapper.map(userDTO, foundUser);
                     return foundUser;
                 })
-                .map(userRepository::saveAndFlush)
-                .map(userReadMapper::map);
+                .map(userRepository::save)
+                .orElseThrow(() -> new IllegalArgumentException("Пользователь с id: " + id + " не найден!"));
     }
 
     @Transactional
