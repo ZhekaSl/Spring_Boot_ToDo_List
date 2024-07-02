@@ -5,7 +5,7 @@ import lombok.Value;
 import java.time.LocalDate;
 
 @Value
-public class UserCreateDTO {
+public class RegistrationUserDTO {
     String username;
     String firstName;
     LocalDate birthDate;

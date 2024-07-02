@@ -12,10 +12,17 @@ spring:
       format_sql: true
       hbm2ddl.auto: validate
     open-in-view: false
+logging:
+  level:
+    org.springframework.security: trace
 
 springdoc:
   api-docs:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+jwt:
+  secret: Xvr8ADeKuDBRKAbc0DQMHqx5cHLzLjx65qLCG8GW08YebuKQZjQfUw5JqB8b
+  lifetime: 24h
+
 
