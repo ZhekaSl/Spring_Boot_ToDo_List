@@ -54,4 +54,15 @@ public class TaskService {
         task.setUser(user);
         return taskRepository.save(task);
     }
+
+    @Transactional
+    public boolean delete(Principal principal, Integer id) {
+        return taskRepository.findById(id)
+                .map(entity -> {
+                    taskRepository.delete(entity);
+                    taskRepository.flush();
+                    return true;
+                })
+                .orElse(false);
+    }
 }
