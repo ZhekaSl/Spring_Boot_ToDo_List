@@ -24,6 +24,7 @@ import java.util.Optional;
 public class TaskService {
     private final TaskRepository taskRepository;
     private final UserService userService;
+    private final TaskCreateMapper taskCreateMapper;
 
     public Task findById(Principal principal, Integer id) {
         User user = userService.findByUsername(principal.getName());
@@ -46,8 +47,9 @@ public class TaskService {
     }
 
     @Transactional
-    public Task create(Principal principal, Task task) {
+    public Task create(Principal principal, TaskCreateDTO taskCreateDTO) {
         User user = userService.findByUsername(principal.getName());
+        Task task = taskCreateMapper.map(taskCreateDTO);
         task.setUser(user);
         return taskRepository.save(task);
     }

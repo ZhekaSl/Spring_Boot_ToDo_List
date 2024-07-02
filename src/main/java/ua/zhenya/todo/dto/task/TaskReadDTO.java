@@ -18,6 +18,20 @@ public class TaskReadDTO {
     boolean completed;
     LocalDateTime completedDate;
     Priority priority;
-    ParentTaskReadDTO parentTask;
-    UserReadDTO user;
+    ParentTaskReadDTO parentTaskReadDTO;
+    UserReadDTO userReadDTO;
+
+
+    @Value
+    public static class ParentTaskReadDTO {
+        Integer id;
+        String name;
+    }
+
+    @Value
+    public static class UserReadDTO {
+        Integer id;
+        String username;
+    }
+
 }

@@ -14,6 +14,4 @@ public class TaskCreateDTO {
     LocalDateTime targetDate;
 
     Priority priority;
-
-    Integer userId;
 }

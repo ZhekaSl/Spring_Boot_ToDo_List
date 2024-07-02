@@ -23,7 +23,6 @@ import java.security.Principal;
 public class TaskController {
     private final TaskService taskService;
     private final TaskReadMapper taskReadMapper;
-    private final TaskCreateMapper taskCreateMapper;
 
     @GetMapping
     public PageResponse<TaskReadDTO> findAll(Principal principal, Pageable pageable) {
@@ -43,9 +42,10 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<TaskReadDTO> create(Principal principal, @RequestBody TaskCreateDTO taskCreateDTO) {
-        Task task = taskCreateMapper.map(taskCreateDTO);
-        taskService.create(principal, task);
-        return ResponseEntity.ok(taskReadMapper.map(task));
+        Task task = taskService.create(principal, taskCreateDTO);
+        TaskReadDTO taskReadDTO = taskReadMapper.map(task);
+
+        return ResponseEntity.ok(taskReadDTO);
     }
 
     @DeleteMapping("/{id}")

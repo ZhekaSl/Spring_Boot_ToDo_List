@@ -1,10 +1,7 @@
 package ua.zhenya.todo.mappers.task;
 
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
-import org.hibernate.annotations.Parent;
 import org.springframework.stereotype.Component;
-import ua.zhenya.todo.dto.task.ParentTaskReadDTO;
 import ua.zhenya.todo.dto.task.TaskReadDTO;
 import ua.zhenya.todo.dto.user.UserReadDTO;
 import ua.zhenya.todo.mappers.Mapper;
@@ -16,24 +13,18 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class TaskReadMapper implements Mapper<Task, TaskReadDTO> {
-    private final UserReadMapper userReadMapper;
 
     @Override
     public TaskReadDTO map(Task object) {
-        UserReadDTO user = Optional.of(object.getUser())
-                .map(userReadMapper::map)
+        TaskReadDTO.UserReadDTO user = Optional.of(object.getUser())
+                .map(u -> new TaskReadDTO.UserReadDTO(u.getId(), u.getUsername()))
                 .orElse(null);
 
 
-        ParentTaskReadDTO parentTaskReadDTO = object.getParentTask() != null ?
-                new ParentTaskReadDTO(
+        TaskReadDTO.ParentTaskReadDTO parentTaskReadDTO = object.getParentTask() != null ?
+                new TaskReadDTO.ParentTaskReadDTO(
                         object.getParentTask().getId(),
-                        object.getParentTask().getName(),
-                        object.getParentTask().getDescription(),
-                        object.getParentTask().getTargetDate(),
-                        object.getParentTask().isCompleted(),
-                        object.getParentTask().getCompletedDate(),
-                        object.getParentTask().getPriority()
+                        object.getParentTask().getName()
                 ) : null;
 
         return new TaskReadDTO(
@@ -47,6 +38,5 @@ public class TaskReadMapper implements Mapper<Task, TaskReadDTO> {
                 parentTaskReadDTO,
                 user);
     }
-
 }
 

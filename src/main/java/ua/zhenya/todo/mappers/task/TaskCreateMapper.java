@@ -37,10 +37,9 @@ public class TaskCreateMapper implements Mapper<TaskCreateDTO, Task> {
         task.setTargetDate(taskDTO.getTargetDate());
         task.setPriority(taskDTO.getPriority());
         task.setCompleted(false);
-        task.setUser(getUser(taskDTO.getUserId()));
     }
 
-    private Task getParentTask(Integer parentTaskId) {
+/*    private Task getParentTask(Integer parentTaskId) {
         return Optional.ofNullable(parentTaskId)
                 .flatMap(taskRepository::findById)
                 .orElse(null);
@@ -50,5 +49,5 @@ public class TaskCreateMapper implements Mapper<TaskCreateDTO, Task> {
         return Optional.ofNullable(userId)
                 .flatMap(userRepository::findById)
                 .orElse(null);
-    }
+    }*/
 }
