@@ -30,13 +30,13 @@ public class SubtaskService {
     @Transactional
     public Task create(Principal principal, Integer parentTaskId, TaskCreateDTO createDTO) {
         User user = userService.findByUsername(principal.getName());
-        Task parentTask = taskService.findById(principal, parentTaskId);
+        Task parentTask = taskService.findById(parentTaskId);
+        taskService.verifyTaskOwner(parentTask, user);
 
         return Optional.of(createDTO)
                 .map(taskCreateMapper::map)
                 .map(subtask -> {
                     subtask.setParentTask(parentTask);
-
                     subtask.setUser(user);
                     return subtask;
                 })
@@ -50,7 +50,6 @@ public class SubtaskService {
         taskService.verifyTaskOwner(parentTask, user);
 
         return taskRepository.findAllByParentTaskId(parentTaskId, pageable);
-
     }
 
 
