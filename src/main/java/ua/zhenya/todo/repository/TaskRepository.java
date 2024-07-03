@@ -12,7 +12,5 @@ import ua.zhenya.todo.model.User;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Integer> {
     Page<Task> findAllByUserIdAndParentTaskIsNull(Integer userId, Pageable pageable);
-
-
-    Page<Task> findAllByUserIdAndParentTaskId(Integer user, Integer parentTaskId, Pageable pageable);
+    Page<Task> findAllByParentTaskId(Integer parentTaskId, Pageable pageable);
 }
