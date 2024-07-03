@@ -1,5 +1,6 @@
 package ua.zhenya.todo.dto.task;
 
+import jakarta.validation.constraints.Future;
 import lombok.Value;
 import ua.zhenya.todo.model.Priority;
 import ua.zhenya.todo.model.Task;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 public class TaskCreateDTO {
     String name;
     String description;
+    @Future
     LocalDateTime targetDate;
-
     Priority priority;
 }

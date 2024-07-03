@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.zhenya.todo.dto.task.TaskCreateDTO;
 import ua.zhenya.todo.dto.task.TaskReadDTO;
+import ua.zhenya.todo.dto.task.TaskUpdateDTO;
 import ua.zhenya.todo.mappers.task.TaskCreateMapper;
 import ua.zhenya.todo.mappers.task.TaskReadMapper;
 import ua.zhenya.todo.mappers.user.UserCreateMapper;
@@ -52,6 +53,10 @@ public class TaskService {
         Task task = taskCreateMapper.map(taskCreateDTO);
         task.setUser(user);
         return taskRepository.save(task);
+    }
+
+    public Task update(Principal principal, Integer id, TaskUpdateDTO taskUpdateDTO) {
+
     }
 
     @Transactional

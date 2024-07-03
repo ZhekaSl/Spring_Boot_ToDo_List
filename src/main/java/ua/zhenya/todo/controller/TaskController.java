@@ -10,6 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ua.zhenya.todo.dto.PageResponse;
 import ua.zhenya.todo.dto.task.TaskCreateDTO;
 import ua.zhenya.todo.dto.task.TaskReadDTO;
+import ua.zhenya.todo.dto.task.TaskUpdateDTO;
 import ua.zhenya.todo.mappers.task.TaskCreateMapper;
 import ua.zhenya.todo.mappers.task.TaskReadMapper;
 import ua.zhenya.todo.model.Task;
@@ -46,6 +47,12 @@ public class TaskController {
         TaskReadDTO taskReadDTO = taskReadMapper.map(task);
 
         return ResponseEntity.ok(taskReadDTO);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<TaskReadDTO> update(Principal principal, @PathVariable Integer id,
+                                              @RequestBody TaskUpdateDTO taskUpdateDTO) {
+        return taskService.update(principal)
     }
 
     @DeleteMapping("/{id}")
