@@ -40,16 +40,16 @@ public class UserService {
     }
 
     @Transactional
-    public User create(RegistrationUserDTO user) {
-        if (!user.getPassword().equals(user.getConfirmPassword()))
-            throw new IllegalArgumentException("Пароли не совпадают");
+    public User create(RegistrationUserDTO userDTO) {
+        if (!userDTO.getPassword().equals(userDTO.getConfirmPassword()))
+            throw new IllegalArgumentException("Пароли не совпадают!");
 
-        return Optional.of(user)
+        return Optional.of(userDTO)
                 .map(userCreateMapper::map)
-                .map(u -> {
+                .map(user -> {
                     Role userRole = roleService.getUserRole();
-                    u.getRoles().add(userRole);
-                    return userRepository.save(u);
+                    user.getRoles().add(userRole);
+                    return userRepository.save(user);
                 })
                 .orElseThrow(() -> new IllegalArgumentException("Ошибка при создании пользователя!"));
     }
