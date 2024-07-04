@@ -1,6 +1,7 @@
 package ua.zhenya.todo.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,29 +14,21 @@ import ua.zhenya.todo.model.User;
 import ua.zhenya.todo.repository.TaskRepository;
 
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Slf4j
 public class TaskService {
     private final TaskRepository taskRepository;
     private final UserService userService;
     private final TaskCreateMapper taskCreateMapper;
 
-/*    public Task findById(Principal principal, Integer id) {
-        User user = userService.findByUsername(principal.getName());
-
-        return taskRepository.findById(id)
-                .map(task -> {
-                    verifyTaskOwner(task, user);
-                    return task;
-                })
-                .orElseThrow(() -> new IllegalArgumentException("Задача с id:" + id + " не найдена!"));
-    }*/
-
     public Task findById(Integer id) {
         return taskRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Задача с id:" + id + " не найдена!"));
+                .orElseThrow(() -> new IllegalArgumentException("Задача с id: " + id + " не найдена!"));
     }
 
     public Task findByIdAndVerifyOwner(Principal principal, Integer id) {
@@ -63,14 +56,13 @@ public class TaskService {
     @Transactional
     public Task create(Principal principal, TaskCreateRequest taskCreateRequest) {
         User user = userService.findByUsername(principal.getName());
+
+        checkDateIfTimeIsPresent(taskCreateRequest.getTargetDate(), taskCreateRequest.getTargetTime());
         Task task = taskCreateMapper.map(taskCreateRequest);
+
         task.setUser(user);
         return taskRepository.save(task);
     }
-
-/*    public Task update(Principal principal, Integer id, TaskUpdateDTO taskUpdateDTO) {
-
-    }*/
 
     @Transactional
     public Task complete(Principal principal, Integer id) {
@@ -89,21 +81,34 @@ public class TaskService {
         Task task = findById(id);
         verifyTaskOwner(task, user);
 
-        if (taskUpdateRequest.getName() != null) {
+        if (taskUpdateRequest.getName() != null && !taskUpdateRequest.getName().equals(task.getName())) {
             task.setName(taskUpdateRequest.getName());
         }
-        if (taskUpdateRequest.getDescription() != null) {
+        if (taskUpdateRequest.getDescription() != null && !taskUpdateRequest.getDescription().equals(task.getDescription())) {
             task.setDescription(taskUpdateRequest.getDescription());
         }
-        if (taskUpdateRequest.getPriority() != null) {
+        if (taskUpdateRequest.getPriority() != null && !taskUpdateRequest.getPriority().equals(task.getPriority())) {
             task.setPriority(taskUpdateRequest.getPriority());
         }
-        if (taskUpdateRequest.getTargetDate() != null) {
-            task.setTargetDate(taskUpdateRequest.getTargetDate());
-        }
 
+        if (taskUpdateRequest.getTargetDate() == null && taskUpdateRequest.getTargetTime() == null) {
+            task.setTargetDate(null);
+            task.setTargetTime(null);
+        } else {
+            if (taskUpdateRequest.getTargetDate() == null) {
+                throw new IllegalArgumentException("Укажите сначала дату!");
+            } else if (!taskUpdateRequest.getTargetDate().equals(task.getTargetDate())) {
+                task.setTargetDate(taskUpdateRequest.getTargetDate());
+            }
+            if (taskUpdateRequest.getTargetTime() == null) {
+                task.setTargetTime(null);
+            } else if (!taskUpdateRequest.getTargetTime().equals(task.getTargetTime())) {
+                task.setTargetTime(taskUpdateRequest.getTargetTime());
+            }
+        }
         return taskRepository.save(task);
     }
+
 
     @Transactional
     public boolean delete(Principal principal, Integer id) {
@@ -118,4 +123,12 @@ public class TaskService {
                 })
                 .orElseThrow(() -> new IllegalArgumentException("Задача с id: " + id + " не найдена!"));
     }
+
+    private void checkDateIfTimeIsPresent(LocalDate date, LocalTime time) {
+        if (date == null && time != null) {
+            throw new IllegalArgumentException("Укажите сначала дату!");
+        }
+    }
+
+
 }

@@ -6,7 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,10 +25,11 @@ public class Task implements BaseEntity<Integer> {
 
     private String name;
     private String description;
-    private LocalDateTime targetDate;
+    private LocalDate targetDate;
+    private LocalTime targetTime;
     private boolean completed;
-    private LocalDateTime completedDate;
-
+    @Column(name = "completed_timestamp")
+    private LocalDateTime completedDateTime;
     @Enumerated(EnumType.STRING)
     private Priority priority;
 

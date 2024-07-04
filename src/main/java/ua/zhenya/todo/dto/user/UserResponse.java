@@ -5,7 +5,7 @@ import lombok.Value;
 import java.time.LocalDate;
 
 @Value
-public class UserReadResponse {
+public class UserResponse {
     Integer id;
     String username;
     String firstname;

@@ -30,8 +30,9 @@ public class TaskReadMapper implements Mapper<Task, TaskResponse> {
                 object.getName(),
                 object.getDescription(),
                 object.getTargetDate(),
+                object.getTargetTime(),
                 object.isCompleted(),
-                object.getCompletedDate(),
+                object.getCompletedDateTime(),
                 object.getPriority(),
                 parentTaskResponse,
                 user);

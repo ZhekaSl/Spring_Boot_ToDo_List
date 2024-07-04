@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.zhenya.todo.dto.PageResponse;
-import ua.zhenya.todo.dto.user.UserReadResponse;
+import ua.zhenya.todo.dto.user.UserResponse;
 import ua.zhenya.todo.dto.user.UserUpdateRequest;
 import ua.zhenya.todo.mappers.user.UserReadMapper;
 import ua.zhenya.todo.service.UserService;
@@ -20,25 +20,25 @@ public class UserController {
     private final UserReadMapper userReadMapper;
 
     @GetMapping
-    public PageResponse<UserReadResponse> findAll(Pageable pageable) {
-        Page<UserReadResponse> page = userService.findAll(pageable)
+    public PageResponse<UserResponse> findAll(Pageable pageable) {
+        Page<UserResponse> page = userService.findAll(pageable)
                 .map(userReadMapper::map);
         return PageResponse.of(page);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserReadResponse> findById(@PathVariable Integer id) {
-        UserReadResponse userReadResponse = userReadMapper
+    public ResponseEntity<UserResponse> findById(@PathVariable Integer id) {
+        UserResponse userResponse = userReadMapper
                 .map(userService.findById(id));
-        return ResponseEntity.ok(userReadResponse);
+        return ResponseEntity.ok(userResponse);
     }
 
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<UserReadResponse> update(@PathVariable Integer id,
-                                                   @RequestBody UserUpdateRequest userDTO) {
-        UserReadResponse user = userReadMapper
+    public ResponseEntity<UserResponse> update(@PathVariable Integer id,
+                                               @RequestBody UserUpdateRequest userDTO) {
+        UserResponse user = userReadMapper
                 .map(userService.update(id, userDTO));
         return ResponseEntity.ok(user);
     }

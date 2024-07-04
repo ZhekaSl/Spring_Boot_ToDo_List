@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.zhenya.todo.dto.PageResponse;
@@ -47,7 +48,7 @@ public class TaskController {
         Task task = taskService.create(principal, taskCreateRequest);
         TaskResponse taskResponse = taskReadMapper.map(task);
 
-        return ResponseEntity.ok(taskResponse);
+        return ResponseEntity.status(HttpStatus.CREATED).body(taskResponse);
     }
 
     @PutMapping("/{id}")

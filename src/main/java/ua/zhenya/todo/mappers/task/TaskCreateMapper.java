@@ -11,8 +11,6 @@ import ua.zhenya.todo.repository.UserRepository;
 @Component
 @RequiredArgsConstructor
 public class TaskCreateMapper implements Mapper<TaskCreateRequest, Task> {
-    private final UserRepository userRepository;
-    private final TaskRepository taskRepository;
     @Override
     public Task map(TaskCreateRequest object) {
        Task task = new Task();
@@ -32,19 +30,9 @@ public class TaskCreateMapper implements Mapper<TaskCreateRequest, Task> {
         task.setName(taskDTO.getName());
         task.setDescription(taskDTO.getDescription());
         task.setTargetDate(taskDTO.getTargetDate());
+        task.setTargetTime(taskDTO.getTargetTime());
         task.setPriority(taskDTO.getPriority());
         task.setCompleted(false);
     }
 
-/*    private Task getParentTask(Integer parentTaskId) {
-        return Optional.ofNullable(parentTaskId)
-                .flatMap(taskRepository::findById)
-                .orElse(null);
-    }
-
-    private User getUser(Integer userId) {
-        return Optional.ofNullable(userId)
-                .flatMap(userRepository::findById)
-                .orElse(null);
-    }*/
 }

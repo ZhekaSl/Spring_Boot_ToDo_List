@@ -3,16 +3,19 @@ package ua.zhenya.todo.dto.task;
 import lombok.Value;
 import ua.zhenya.todo.model.Priority;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Value
 public class TaskResponse {
     Integer id;
     String name;
     String description;
-    LocalDateTime targetDate;
+    LocalDate targetDate;
+    LocalTime targetTime;
     boolean completed;
-    LocalDateTime completedDate;
+    LocalDateTime completedDateTime;
     Priority priority;
     ParentTaskResponse parentTask;
     UserResponse user;
