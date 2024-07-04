@@ -20,7 +20,6 @@ public class TaskResponse {
     ParentTaskResponse parentTask;
     UserResponse user;
 
-
     @Value
     public static class ParentTaskResponse {
         Integer id;
