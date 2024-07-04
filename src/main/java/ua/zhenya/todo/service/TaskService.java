@@ -5,7 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.zhenya.todo.dto.task.TaskCreateDTO;
+import ua.zhenya.todo.dto.task.TaskCreateRequest;
+import ua.zhenya.todo.dto.task.TaskUpdateRequest;
 import ua.zhenya.todo.mappers.task.TaskCreateMapper;
 import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.model.User;
@@ -37,9 +38,8 @@ public class TaskService {
                 .orElseThrow(() -> new IllegalArgumentException("Задача с id:" + id + " не найдена!"));
     }
 
-    public Task findById(Principal principal, Integer id) {
+    public Task findByIdAndVerifyOwner(Principal principal, Integer id) {
         User user = userService.findByUsername(principal.getName());
-
         Task task = findById(id);
         verifyTaskOwner(task, user);
 
@@ -61,9 +61,9 @@ public class TaskService {
     }
 
     @Transactional
-    public Task create(Principal principal, TaskCreateDTO taskCreateDTO) {
+    public Task create(Principal principal, TaskCreateRequest taskCreateRequest) {
         User user = userService.findByUsername(principal.getName());
-        Task task = taskCreateMapper.map(taskCreateDTO);
+        Task task = taskCreateMapper.map(taskCreateRequest);
         task.setUser(user);
         return taskRepository.save(task);
     }
@@ -71,6 +71,39 @@ public class TaskService {
 /*    public Task update(Principal principal, Integer id, TaskUpdateDTO taskUpdateDTO) {
 
     }*/
+
+    @Transactional
+    public Task complete(Principal principal, Integer id) {
+        User user = userService.findByUsername(principal.getName());
+        Task task = findById(id);
+        verifyTaskOwner(task, user);
+
+        task.setCompleted(!task.isCompleted());
+
+        return taskRepository.save(task);
+    }
+
+    @Transactional
+    public Task update(Principal principal, Integer id, TaskUpdateRequest taskUpdateRequest) {
+        User user = userService.findByUsername(principal.getName());
+        Task task = findById(id);
+        verifyTaskOwner(task, user);
+
+        if (taskUpdateRequest.getName() != null) {
+            task.setName(taskUpdateRequest.getName());
+        }
+        if (taskUpdateRequest.getDescription() != null) {
+            task.setDescription(taskUpdateRequest.getDescription());
+        }
+        if (taskUpdateRequest.getPriority() != null) {
+            task.setPriority(taskUpdateRequest.getPriority());
+        }
+        if (taskUpdateRequest.getTargetDate() != null) {
+            task.setTargetDate(taskUpdateRequest.getTargetDate());
+        }
+
+        return taskRepository.save(task);
+    }
 
     @Transactional
     public boolean delete(Principal principal, Integer id) {
