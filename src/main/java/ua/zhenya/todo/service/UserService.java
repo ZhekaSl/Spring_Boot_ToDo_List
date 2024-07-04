@@ -7,11 +7,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.zhenya.todo.dto.user.RegistrationUserDTO;
-import ua.zhenya.todo.dto.user.UserReadDTO;
-import ua.zhenya.todo.dto.user.UserUpdateDTO;
+import ua.zhenya.todo.dto.user.RegistrationUserRequest;
+import ua.zhenya.todo.dto.user.UserUpdateRequest;
 import ua.zhenya.todo.mappers.user.UserCreateMapper;
-import ua.zhenya.todo.mappers.user.UserReadMapper;
 import ua.zhenya.todo.mappers.user.UserUpdateMapper;
 import ua.zhenya.todo.model.Role;
 import ua.zhenya.todo.model.User;
@@ -40,7 +38,7 @@ public class UserService {
     }
 
     @Transactional
-    public User create(RegistrationUserDTO userDTO) {
+    public User create(RegistrationUserRequest userDTO) {
         if (!userDTO.getPassword().equals(userDTO.getConfirmPassword()))
             throw new IllegalArgumentException("Пароли не совпадают!");
 
@@ -61,7 +59,7 @@ public class UserService {
 
 
     @Transactional
-    public User update(Integer id, UserUpdateDTO userDTO) {
+    public User update(Integer id, UserUpdateRequest userDTO) {
         return userRepository.findById(id)
                 .map(foundUser -> {
                     if (!passwordEncoder.matches(userDTO.getOldPassword(), foundUser.getPassword())) {
