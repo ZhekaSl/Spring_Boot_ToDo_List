@@ -3,16 +3,14 @@ package ua.zhenya.todo.dto.task;
 import jakarta.validation.constraints.Future;
 import lombok.Value;
 import ua.zhenya.todo.model.Priority;
-import ua.zhenya.todo.model.Task;
-import ua.zhenya.todo.model.User;
 
 import java.time.LocalDateTime;
 
 @Value
-public class TaskCreateDTO {
+public class TaskCreateRequest {
     String name;
     String description;
-    @Future
+    @Future(message = "Дата не может быть раньше текующей!")
     LocalDateTime targetDate;
     Priority priority;
 }

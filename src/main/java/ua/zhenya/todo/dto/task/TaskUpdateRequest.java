@@ -7,10 +7,10 @@ import ua.zhenya.todo.model.Priority;
 import java.time.LocalDateTime;
 
 @Value
-public class TaskUpdateDTO {
+public class TaskUpdateRequest {
     String name;
     String description;
-    @Future(message = "Введите корректную дату выполнения задачи!")
+    @Future(message = "Дата не может быть раньше текующей!")
     LocalDateTime targetDate;
     boolean isCompleted;
     Priority priority;

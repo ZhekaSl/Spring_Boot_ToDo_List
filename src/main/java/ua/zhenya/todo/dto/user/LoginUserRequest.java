@@ -3,7 +3,7 @@ package ua.zhenya.todo.dto.user;
 import lombok.Value;
 
 @Value
-public class LoginUserDTO {
+public class LoginUserRequest {
     String username;
     String password;
 }

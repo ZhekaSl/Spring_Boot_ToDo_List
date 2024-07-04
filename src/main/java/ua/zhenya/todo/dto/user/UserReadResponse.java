@@ -5,10 +5,9 @@ import lombok.Value;
 import java.time.LocalDate;
 
 @Value
-public class RegistrationUserDTO {
+public class UserReadResponse {
+    Integer id;
     String username;
-    String firstName;
+    String firstname;
     LocalDate birthDate;
-    String password;
-    String confirmPassword;
 }

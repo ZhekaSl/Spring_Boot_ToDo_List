@@ -6,7 +6,7 @@ import ua.zhenya.todo.model.Priority;
 import java.time.LocalDateTime;
 
 @Value
-public class ParentTaskReadDTO {
+public class ParentTaskResponse {
     Integer id;
     String name;
     String description;

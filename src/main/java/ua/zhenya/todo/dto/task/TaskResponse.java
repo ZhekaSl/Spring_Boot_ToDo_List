@@ -1,16 +1,12 @@
 package ua.zhenya.todo.dto.task;
 
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.Value;
-import ua.zhenya.todo.dto.user.UserReadDTO;
 import ua.zhenya.todo.model.Priority;
-import ua.zhenya.todo.model.Task;
 
 import java.time.LocalDateTime;
 
 @Value
-public class TaskReadDTO {
+public class TaskResponse {
     Integer id;
     String name;
     String description;
@@ -18,18 +14,18 @@ public class TaskReadDTO {
     boolean completed;
     LocalDateTime completedDate;
     Priority priority;
-    ParentTaskReadDTO parentTaskReadDTO;
-    UserReadDTO userReadDTO;
+    ParentTaskResponse parentTask;
+    UserResponse user;
 
 
     @Value
-    public static class ParentTaskReadDTO {
+    public static class ParentTaskResponse {
         Integer id;
         String name;
     }
 
     @Value
-    public static class UserReadDTO {
+    public static class UserResponse {
         Integer id;
         String username;
     }
