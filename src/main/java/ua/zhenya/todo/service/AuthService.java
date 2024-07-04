@@ -10,8 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ua.zhenya.todo.dto.user.JwtResponse;
-import ua.zhenya.todo.dto.user.LoginUserDTO;
-import ua.zhenya.todo.dto.user.RegistrationUserDTO;
+import ua.zhenya.todo.dto.user.LoginUserRequest;
+import ua.zhenya.todo.dto.user.RegistrationUserRequest;
 import ua.zhenya.todo.exception.ErrorResponse;
 
 @Service
@@ -22,28 +22,25 @@ public class AuthService {
     private final JwtTokenService jwtTokenService;
     private final AuthenticationManager authenticationManager;
 
-    public ResponseEntity<?> createAuthToken(LoginUserDTO loginUserDTO) {
+    public ResponseEntity<?> createAuthToken(LoginUserRequest loginUserRequest) {
         try {
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginUserDTO.getUsername(), loginUserDTO.getPassword()));
+                    new UsernamePasswordAuthenticationToken(loginUserRequest.getUsername(), loginUserRequest.getPassword()));
         } catch (BadCredentialsException e) {
             return new ResponseEntity<>(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Неправильный логин или пароль!"), HttpStatus.UNAUTHORIZED);
         }
-        UserDetails userDetails = userDetailsService.loadUserByUsername(loginUserDTO.getUsername());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(loginUserRequest.getUsername());
 
         String token = jwtTokenService.generateToken(userDetails);
         return ResponseEntity.ok(new JwtResponse(token));
     }
 
-    public ResponseEntity<?> createUser(RegistrationUserDTO registrationUserDTO) {
-        if (!registrationUserDTO.getPassword().equals(registrationUserDTO.getConfirmPassword())) {
-            return new ResponseEntity<>(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Пароли не совпадают!"), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<?> createUser(RegistrationUserRequest registrationUserRequest) {
         try {
-            userService.findByUsername(registrationUserDTO.getUsername());
+            userService.findByUsername(registrationUserRequest.getUsername());
             return new ResponseEntity<>(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Пользователь с указанным именем уже существует!"), HttpStatus.BAD_REQUEST);
         } catch (UsernameNotFoundException e) {
-            return ResponseEntity.ok(userService.create(registrationUserDTO));
+            return ResponseEntity.ok(userService.create(registrationUserRequest));
         }
     }
 }
