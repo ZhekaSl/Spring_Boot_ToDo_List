@@ -33,6 +33,15 @@ public class User implements BaseEntity<Integer>, UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
+    public void addTask(Task task) {
+        this.tasks.add(task);
+        task.setUser(this);
+    }
+
+    public void removeTask(Task task) {
+        this.tasks.remove(task);
+        task.setUser(null);
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
