@@ -1,5 +1,6 @@
 package ua.zhenya.todo.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -12,10 +13,11 @@ import ua.zhenya.todo.mappers.task.TaskCreateMapper;
 import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.model.User;
 import ua.zhenya.todo.repository.TaskRepository;
+import ua.zhenya.todo.utils.TaskUtils;
 
 import java.security.Principal;
 import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 @Service
 @Transactional(readOnly = true)
@@ -28,24 +30,16 @@ public class TaskService {
 
     public Task findById(Integer id) {
         return taskRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Задача с id: " + id + " не найдена!"));
+                .orElseThrow(() -> new EntityNotFoundException("Задача с id: " + id + " не найдена!"));
     }
 
     public Task findByIdAndVerifyOwner(Principal principal, Integer id) {
         User user = userService.findByUsername(principal.getName());
         Task task = findById(id);
-        verifyTaskOwner(task, user);
+        TaskUtils.verifyTaskOwner(task, user);
 
         return task;
     }
-
-
-    public void verifyTaskOwner(Task task, User user) {
-        if (!task.getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException("Вы не можете этого сделать!");
-        }
-    }
-
 
     public Page<Task> findAll(Principal principal, Pageable pageable) {
         User user = userService.findByUsername(principal.getName());
@@ -57,10 +51,10 @@ public class TaskService {
     public Task create(Principal principal, TaskCreateRequest taskCreateRequest) {
         User user = userService.findByUsername(principal.getName());
 
-        checkDateIfTimeIsPresent(taskCreateRequest.getTargetDate(), taskCreateRequest.getTargetTime());
+        TaskUtils.checkDateIfTimeIsPresent(taskCreateRequest.getTargetDate(), taskCreateRequest.getTargetTime());
         Task task = taskCreateMapper.map(taskCreateRequest);
 
-        task.setUser(user);
+        user.addTask(task);
         return taskRepository.save(task);
     }
 
@@ -68,9 +62,15 @@ public class TaskService {
     public Task complete(Principal principal, Integer id) {
         User user = userService.findByUsername(principal.getName());
         Task task = findById(id);
-        verifyTaskOwner(task, user);
+        TaskUtils.verifyTaskOwner(task, user);
 
         task.setCompleted(!task.isCompleted());
+
+        if (task.isCompleted()) {
+            task.setCompletedDateTime(LocalDateTime.now());
+        } else {
+            task.setCompletedDateTime(null);
+        }
 
         return taskRepository.save(task);
     }
@@ -79,7 +79,7 @@ public class TaskService {
     public Task update(Principal principal, Integer id, TaskUpdateRequest taskUpdateRequest) {
         User user = userService.findByUsername(principal.getName());
         Task task = findById(id);
-        verifyTaskOwner(task, user);
+        TaskUtils.verifyTaskOwner(task, user);
 
         if (taskUpdateRequest.getName() != null && !taskUpdateRequest.getName().equals(task.getName())) {
             task.setName(taskUpdateRequest.getName());
@@ -111,24 +111,12 @@ public class TaskService {
 
 
     @Transactional
-    public boolean delete(Principal principal, Integer id) {
+    public void delete(Principal principal, Integer id) {
         User user = userService.findByUsername(principal.getName());
+        Task task = findById(id);
 
-        return taskRepository.findById(id)
-                .map(task -> {
-                    verifyTaskOwner(task, user);
-                    taskRepository.delete(task);
-                    taskRepository.flush();
-                    return true;
-                })
-                .orElseThrow(() -> new IllegalArgumentException("Задача с id: " + id + " не найдена!"));
+        TaskUtils.verifyTaskOwner(task, user);
+        user.removeTask(task);
+        taskRepository.delete(task);
     }
-
-    private void checkDateIfTimeIsPresent(LocalDate date, LocalTime time) {
-        if (date == null && time != null) {
-            throw new IllegalArgumentException("Укажите сначала дату!");
-        }
-    }
-
-
 }

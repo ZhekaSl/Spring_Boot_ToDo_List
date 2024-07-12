@@ -43,6 +43,10 @@ public class User implements BaseEntity<Integer>, UserDetails {
         task.setUser(null);
     }
 
+    public boolean isAdmin() {
+        return getRoles().stream().anyMatch(role -> role.getName().equals("ROLE_ADMIN"));
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles;

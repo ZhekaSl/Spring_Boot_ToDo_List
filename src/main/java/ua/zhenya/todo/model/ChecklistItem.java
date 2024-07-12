@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
+@Table(name = "checklist_items")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

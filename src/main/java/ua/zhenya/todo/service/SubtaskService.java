@@ -10,6 +10,7 @@ import ua.zhenya.todo.mappers.task.TaskCreateMapper;
 import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.model.User;
 import ua.zhenya.todo.repository.TaskRepository;
+import ua.zhenya.todo.utils.TaskUtils;
 
 import java.security.Principal;
 import java.util.Optional;
@@ -27,26 +28,21 @@ public class SubtaskService {
     public Task create(Principal principal, Integer parentTaskId, TaskCreateRequest createDTO) {
         User user = userService.findByUsername(principal.getName());
         Task parentTask = taskService.findById(parentTaskId);
-        taskService.verifyTaskOwner(parentTask, user);
+        TaskUtils.verifyTaskOwner(parentTask, user);
 
-        return Optional.of(createDTO)
-                .map(taskCreateMapper::map)
-                .map(subtask -> {
-                    subtask.setParentTask(parentTask);
-                    subtask.setUser(user);
-                    return subtask;
-                })
-                .map(taskRepository::save)
-                .orElseThrow();
+        Task subtask = taskCreateMapper.map(createDTO);
+
+        user.addTask(subtask);
+        parentTask.addSubtask(subtask);
+        return taskRepository.save(subtask);
+
     }
 
     public Page<Task> findAll(Principal principal, Integer parentTaskId, Pageable pageable) {
         User user = userService.findByUsername(principal.getName());
         Task parentTask = taskService.findById(parentTaskId);
-        taskService.verifyTaskOwner(parentTask, user);
+        TaskUtils.verifyTaskOwner(parentTask, user);
 
         return taskRepository.findAllByParentTaskId(parentTaskId, pageable);
     }
-
-
 }

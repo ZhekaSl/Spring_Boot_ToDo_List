@@ -31,7 +31,7 @@ public class SubtaskController {
     }
 
     @GetMapping
-    public PageResponse<TaskResponse> getAllSubtasks(Principal principal, @PathVariable Integer parentTaskId, Pageable pageable) {
+    public PageResponse<TaskResponse> findAll(Principal principal, @PathVariable Integer parentTaskId, Pageable pageable) {
         Page<TaskResponse> page = subtaskService.findAll(principal, parentTaskId, pageable)
                 .map(taskReadMapper::map);
         return PageResponse.of(page);

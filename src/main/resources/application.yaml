@@ -23,6 +23,6 @@ springdoc:
     path: /swagger-ui.html
 jwt:
   secret: Xvr8ADeKuDBRKAbc0DQMHqx5cHLzLjx65qLCG8GW08YebuKQZjQfUw5JqB8b
-  lifetime: 25m
+  lifetime: 600m
 
 

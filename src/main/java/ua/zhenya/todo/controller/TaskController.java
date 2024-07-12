@@ -19,7 +19,7 @@ import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/tasks")
+@RequestMapping("/api/v1/tasks")
 public class TaskController {
     private final TaskService taskService;
     private final TaskReadMapper taskReadMapper;
@@ -31,6 +31,7 @@ public class TaskController {
                 .map(taskReadMapper::map);
         return PageResponse.of(page);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<TaskResponse> findById(Principal principal,
@@ -74,9 +75,8 @@ public class TaskController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(Principal principal,
                                     @PathVariable Integer id) {
-        return taskService.delete(principal, id)
-                ? ResponseEntity.noContent().build()
-                : ResponseEntity.notFound().build();
+        taskService.delete(principal, id);
+        return ResponseEntity.noContent().build();
     }
 
 }
