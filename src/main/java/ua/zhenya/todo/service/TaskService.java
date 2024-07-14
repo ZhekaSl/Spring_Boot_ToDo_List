@@ -5,18 +5,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.zhenya.todo.dto.task.TaskCreateRequest;
-import ua.zhenya.todo.dto.task.TaskUpdateRequest;
-import ua.zhenya.todo.mappers.task.TaskCreateMapper;
+import ua.zhenya.todo.mappers.TaskMapper;
 import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.model.User;
 import ua.zhenya.todo.repository.TaskRepository;
 import ua.zhenya.todo.utils.TaskUtils;
 
 import java.security.Principal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
@@ -26,7 +25,7 @@ import java.time.LocalDateTime;
 public class TaskService {
     private final TaskRepository taskRepository;
     private final UserService userService;
-    private final TaskCreateMapper taskCreateMapper;
+    private final TaskMapper taskMapper;
 
     public Task findById(Integer id) {
         return taskRepository.findById(id)
@@ -49,10 +48,11 @@ public class TaskService {
 
     @Transactional
     public Task create(Principal principal, TaskCreateRequest taskCreateRequest) {
+
         User user = userService.findByUsername(principal.getName());
 
         TaskUtils.checkDateIfTimeIsPresent(taskCreateRequest.getTargetDate(), taskCreateRequest.getTargetTime());
-        Task task = taskCreateMapper.map(taskCreateRequest);
+        Task task = taskMapper.toEntity(taskCreateRequest);
 
         user.addTask(task);
         return taskRepository.save(task);
@@ -76,7 +76,7 @@ public class TaskService {
     }
 
     @Transactional
-    public Task update(Principal principal, Integer id, TaskUpdateRequest taskUpdateRequest) {
+    public Task update(Principal principal, Integer id, TaskCreateRequest taskUpdateRequest) {
         User user = userService.findByUsername(principal.getName());
         Task task = findById(id);
         TaskUtils.verifyTaskOwner(task, user);
@@ -114,9 +114,13 @@ public class TaskService {
     public void delete(Principal principal, Integer id) {
         User user = userService.findByUsername(principal.getName());
         Task task = findById(id);
-
         TaskUtils.verifyTaskOwner(task, user);
+        Task parentTask = task.getParentTask();
+        if (parentTask != null) {
+            parentTask.removeSubtask(task);
+        }
         user.removeTask(task);
+
         taskRepository.delete(task);
     }
 }

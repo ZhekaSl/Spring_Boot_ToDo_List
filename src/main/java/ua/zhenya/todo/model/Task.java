@@ -36,13 +36,13 @@ public class Task implements BaseEntity<Integer> {
     @JoinColumn(name = "parent_task_id")
     private Task parentTask;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "parentTask", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "parentTask", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Task> subtasks = new ArrayList<>();
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ChecklistItem> checklistItems = new ArrayList<>();
 
     public void addChecklistItem(ChecklistItem checklistItem) {

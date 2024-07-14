@@ -10,5 +10,4 @@ public class ChecklistItemCreateRequest {
     String title;
     LocalDate targetDate;
     LocalTime targetTime;
-
 }

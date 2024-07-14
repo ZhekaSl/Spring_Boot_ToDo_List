@@ -6,14 +6,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.zhenya.todo.dto.task.TaskCreateRequest;
-import ua.zhenya.todo.mappers.task.TaskCreateMapper;
+import ua.zhenya.todo.mappers.TaskMapper;
 import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.model.User;
 import ua.zhenya.todo.repository.TaskRepository;
 import ua.zhenya.todo.utils.TaskUtils;
 
 import java.security.Principal;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +21,7 @@ public class SubtaskService {
     private final TaskService taskService;
     private final TaskRepository taskRepository;
     private final UserService userService;
-    private final TaskCreateMapper taskCreateMapper;
+    private final TaskMapper taskMapper;
 
     @Transactional
     public Task create(Principal principal, Integer parentTaskId, TaskCreateRequest createDTO) {
@@ -30,7 +29,7 @@ public class SubtaskService {
         Task parentTask = taskService.findById(parentTaskId);
         TaskUtils.verifyTaskOwner(parentTask, user);
 
-        Task subtask = taskCreateMapper.map(createDTO);
+        Task subtask = taskMapper.toEntity(createDTO);
 
         user.addTask(subtask);
         parentTask.addSubtask(subtask);

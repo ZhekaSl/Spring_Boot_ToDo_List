@@ -9,8 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.zhenya.todo.dto.user.RegistrationUserRequest;
 import ua.zhenya.todo.dto.user.UserUpdateRequest;
-import ua.zhenya.todo.mappers.user.UserCreateMapper;
-import ua.zhenya.todo.mappers.user.UserUpdateMapper;
+import ua.zhenya.todo.mappers.UserMapper;
 import ua.zhenya.todo.model.Role;
 import ua.zhenya.todo.model.User;
 import ua.zhenya.todo.repository.UserRepository;
@@ -22,8 +21,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final UserCreateMapper userCreateMapper;
-    private final UserUpdateMapper userUpdateMapper;
+    private final UserMapper userMapper;
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
 
@@ -43,7 +41,7 @@ public class UserService {
             throw new IllegalArgumentException("Пароли не совпадают!");
 
         return Optional.of(userDTO)
-                .map(userCreateMapper::map)
+                .map(userMapper::toEntity)
                 .map(user -> {
                     Role userRole = roleService.getUserRole();
                     user.getRoles().add(userRole);
@@ -65,7 +63,7 @@ public class UserService {
                     if (!passwordEncoder.matches(userDTO.getOldPassword(), foundUser.getPassword())) {
                         throw new IllegalArgumentException("Неверный старый пароль!");
                     }
-                    userUpdateMapper.map(userDTO, foundUser);
+                    userMapper.map(userDTO, foundUser);
                     return foundUser;
                 })
                 .map(userRepository::save)

@@ -15,7 +15,6 @@ spring:
 logging:
   level:
     org.springframework.security: trace
-
 springdoc:
   api-docs:
     path: /v3/api-docs

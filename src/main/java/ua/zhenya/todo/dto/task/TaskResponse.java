@@ -1,11 +1,13 @@
 package ua.zhenya.todo.dto.task;
 
 import lombok.Value;
+import ua.zhenya.todo.dto.checklist.ChecklistItemResponse;
 import ua.zhenya.todo.model.Priority;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Value
 public class TaskResponse {
@@ -17,19 +19,8 @@ public class TaskResponse {
     boolean completed;
     LocalDateTime completedDateTime;
     Priority priority;
-    ParentTaskResponse parentTask;
-    UserResponse user;
-
-    @Value
-    public static class ParentTaskResponse {
-        Integer id;
-        String name;
-    }
-
-    @Value
-    public static class UserResponse {
-        Integer id;
-        String username;
-    }
-
+    Integer parentId;
+    Integer creatorId;
+    List<ChecklistItemResponse> checklistItems;
+    List<SubtaskResponse> subtasks;
 }

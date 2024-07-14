@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @Value
 public class UserUpdateRequest {
     String username;
-    String firstName;
+    String firstname;
     LocalDate birthDate;
     String oldPassword;
     @Size(min = 8, message = "Пароль должен содержать минимум 8 символов!")

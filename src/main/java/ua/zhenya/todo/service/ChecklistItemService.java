@@ -9,8 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.zhenya.todo.dto.checklist.ChecklistItemCreateRequest;
 import ua.zhenya.todo.events.event.ChecklistItemStatusUpdatedEvent;
-import ua.zhenya.todo.mappers.checklist.ChecklistCreateMapper;
-import ua.zhenya.todo.mappers.checklist.ChecklistUpdateMapper;
+import ua.zhenya.todo.mappers.ChecklistItemMapper;
 import ua.zhenya.todo.model.ChecklistItem;
 import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.model.User;
@@ -26,8 +25,7 @@ public class ChecklistItemService {
     private final ChecklistItemRepository checklistItemRepository;
     private final TaskService taskService;
     private final UserService userService;
-    private final ChecklistCreateMapper checklistCreateMapper;
-    private final ChecklistUpdateMapper checklistUpdateMapper;
+    private final ChecklistItemMapper checklistItemMapper;
     private final ApplicationEventPublisher eventPublisher;
 
 
@@ -52,7 +50,7 @@ public class ChecklistItemService {
 
         TaskUtils.checkDateIfTimeIsPresent(checklistItemCreateRequest.getTargetDate(), checklistItemCreateRequest.getTargetTime());
 
-        ChecklistItem checklistItem = checklistCreateMapper.map(checklistItemCreateRequest);
+        ChecklistItem checklistItem = checklistItemMapper.toEntity(checklistItemCreateRequest);
         task.addChecklistItem(checklistItem);
 
         return checklistItemRepository.save(checklistItem);
@@ -66,7 +64,7 @@ public class ChecklistItemService {
         ChecklistItem checklistItem = findById(checklistItemId);
         checkTaskContainsChecklistItem(task, checklistItem);
 
-        checklistUpdateMapper.map(checklistItemCreateRequest, checklistItem);
+        checklistItemMapper.toEntity(checklistItemCreateRequest, checklistItem);
 
 
         return checklistItemRepository.save(checklistItem);

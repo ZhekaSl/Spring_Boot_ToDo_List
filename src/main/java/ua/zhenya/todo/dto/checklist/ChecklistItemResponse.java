@@ -7,6 +7,7 @@ import java.time.LocalTime;
 
 @Value
 public class ChecklistItemResponse {
+    Integer id;
     String title;
     boolean completed;
     LocalDate targetDate;
