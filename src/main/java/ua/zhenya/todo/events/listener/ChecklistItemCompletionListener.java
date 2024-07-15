@@ -1,9 +1,10 @@
-package ua.zhenya.todo.events.event;
+package ua.zhenya.todo.events.listener;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import ua.zhenya.todo.events.event.ChecklistItemStatusUpdatedEvent;
 import ua.zhenya.todo.model.ChecklistItem;
 import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.repository.TaskRepository;

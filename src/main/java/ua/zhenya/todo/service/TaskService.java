@@ -33,7 +33,7 @@ public class TaskService {
     }
 
     public Task findByIdAndVerifyOwner(Principal principal, Integer id) {
-        User user = userService.findByUsername(principal.getName());
+        User user = userService.findByEmail(principal.getName());
         Task task = findById(id);
         TaskUtils.verifyTaskOwner(task, user);
 
@@ -41,7 +41,7 @@ public class TaskService {
     }
 
     public Page<Task> findAll(Principal principal, Pageable pageable) {
-        User user = userService.findByUsername(principal.getName());
+        User user = userService.findByEmail(principal.getName());
 
         return taskRepository.findAllByUserIdAndParentTaskIsNull(user.getId(), pageable);
     }
@@ -49,7 +49,7 @@ public class TaskService {
     @Transactional
     public Task create(Principal principal, TaskCreateRequest taskCreateRequest) {
 
-        User user = userService.findByUsername(principal.getName());
+        User user = userService.findByEmail(principal.getName());
 
         TaskUtils.checkDateIfTimeIsPresent(taskCreateRequest.getTargetDate(), taskCreateRequest.getTargetTime());
         Task task = taskMapper.toEntity(taskCreateRequest);
@@ -60,7 +60,7 @@ public class TaskService {
 
     @Transactional
     public Task complete(Principal principal, Integer id) {
-        User user = userService.findByUsername(principal.getName());
+        User user = userService.findByEmail(principal.getName());
         Task task = findById(id);
         TaskUtils.verifyTaskOwner(task, user);
 
@@ -77,7 +77,7 @@ public class TaskService {
 
     @Transactional
     public Task update(Principal principal, Integer id, TaskCreateRequest taskUpdateRequest) {
-        User user = userService.findByUsername(principal.getName());
+        User user = userService.findByEmail(principal.getName());
         Task task = findById(id);
         TaskUtils.verifyTaskOwner(task, user);
 
@@ -112,7 +112,7 @@ public class TaskService {
 
     @Transactional
     public void delete(Principal principal, Integer id) {
-        User user = userService.findByUsername(principal.getName());
+        User user = userService.findByEmail(principal.getName());
         Task task = findById(id);
         TaskUtils.verifyTaskOwner(task, user);
         Task parentTask = task.getParentTask();

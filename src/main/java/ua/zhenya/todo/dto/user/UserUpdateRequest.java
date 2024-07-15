@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 @Value
 public class UserUpdateRequest {
-    String username;
+    String email;
     String firstname;
     LocalDate birthDate;
     String oldPassword;

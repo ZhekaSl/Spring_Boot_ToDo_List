@@ -7,7 +7,7 @@ import java.time.LocalDate;
 @Value
 public class UserResponse {
     Integer id;
-    String username;
+    String email;
     String firstname;
     LocalDate birthDate;
 }

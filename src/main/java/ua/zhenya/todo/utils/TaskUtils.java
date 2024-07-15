@@ -15,7 +15,7 @@ public class TaskUtils {
     }
 
     public static void verifyTaskOwner(Task task, User user) {
-        if (!(user.isAdmin() || task.getUser().getId().equals(user.getId()))) {
+        if (!task.getUser().getId().equals(user.getId())) {
             throw new IllegalArgumentException("Вы не можете этого сделать!");
         }
     }

@@ -25,7 +25,7 @@ public class SubtaskService {
 
     @Transactional
     public Task create(Principal principal, Integer parentTaskId, TaskCreateRequest createDTO) {
-        User user = userService.findByUsername(principal.getName());
+        User user = userService.findByEmail(principal.getName());
         Task parentTask = taskService.findById(parentTaskId);
         TaskUtils.verifyTaskOwner(parentTask, user);
 
@@ -38,7 +38,7 @@ public class SubtaskService {
     }
 
     public Page<Task> findAll(Principal principal, Integer parentTaskId, Pageable pageable) {
-        User user = userService.findByUsername(principal.getName());
+        User user = userService.findByEmail(principal.getName());
         Task parentTask = taskService.findById(parentTaskId);
         TaskUtils.verifyTaskOwner(parentTask, user);
 

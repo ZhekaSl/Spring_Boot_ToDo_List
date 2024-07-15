@@ -50,9 +50,9 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Ошибка при создании пользователя!"));
     }
 
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с именем: " + username + " не был найден!"));
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с именем: " + email + " не был найден!"));
     }
 
 

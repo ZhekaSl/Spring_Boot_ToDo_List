@@ -25,11 +25,11 @@ public class AuthService {
     public ResponseEntity<?> createAuthToken(LoginUserRequest loginUserRequest) {
         try {
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginUserRequest.getUsername(), loginUserRequest.getPassword()));
+                    new UsernamePasswordAuthenticationToken(loginUserRequest.getEmail(), loginUserRequest.getPassword()));
         } catch (BadCredentialsException e) {
             return new ResponseEntity<>(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Неправильный логин или пароль!"), HttpStatus.UNAUTHORIZED);
         }
-        UserDetails userDetails = userDetailsService.loadUserByUsername(loginUserRequest.getUsername());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(loginUserRequest.getEmail());
 
         String token = jwtTokenService.generateToken(userDetails);
         return ResponseEntity.ok(new JwtResponse(token));
@@ -37,8 +37,8 @@ public class AuthService {
 
     public ResponseEntity<?> createUser(RegistrationUserRequest registrationUserRequest) {
         try {
-            userService.findByUsername(registrationUserRequest.getUsername());
-            return new ResponseEntity<>(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Пользователь с указанным именем уже существует!"), HttpStatus.BAD_REQUEST);
+            userService.findByEmail(registrationUserRequest.getEmail());
+            return new ResponseEntity<>(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Пользователь с указанным email уже существует!"), HttpStatus.BAD_REQUEST);
         } catch (UsernameNotFoundException e) {
             return ResponseEntity.ok(userService.create(registrationUserRequest));
         }

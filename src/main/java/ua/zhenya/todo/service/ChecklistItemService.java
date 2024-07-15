@@ -35,7 +35,7 @@ public class ChecklistItemService {
     }
 
     public Page<ChecklistItem> findAll(Principal principal, Integer taskId, Pageable pageable) {
-        User user = userService.findByUsername(principal.getName());
+        User user = userService.findByEmail(principal.getName());
         Task task = taskService.findById(taskId);
         TaskUtils.verifyTaskOwner(task, user);
 
@@ -44,7 +44,7 @@ public class ChecklistItemService {
 
     @Transactional
     public ChecklistItem create(Principal principal, Integer taskId, ChecklistItemCreateRequest checklistItemCreateRequest) {
-        User user = userService.findByUsername(principal.getName());
+        User user = userService.findByEmail(principal.getName());
         Task task = taskService.findById(taskId);
         TaskUtils.verifyTaskOwner(task, user);
 
@@ -58,7 +58,7 @@ public class ChecklistItemService {
 
     @Transactional
     public ChecklistItem update(Principal principal, Integer taskId, Integer checklistItemId, ChecklistItemCreateRequest checklistItemCreateRequest) {
-        User user = userService.findByUsername(principal.getName());
+        User user = userService.findByEmail(principal.getName());
         Task task = taskService.findById(taskId);
         TaskUtils.verifyTaskOwner(task, user);
         ChecklistItem checklistItem = findById(checklistItemId);
@@ -72,7 +72,7 @@ public class ChecklistItemService {
 
     @Transactional
     public void delete(Principal principal, Integer taskId, Integer checklistItemId) {
-        User user = userService.findByUsername(principal.getName());
+        User user = userService.findByEmail(principal.getName());
         Task task = taskService.findById(taskId);
         TaskUtils.verifyTaskOwner(task, user);
 
@@ -86,7 +86,7 @@ public class ChecklistItemService {
 
     @Transactional
     public ChecklistItem complete(Principal principal, Integer taskId, Integer checklistItemId) {
-        User user = userService.findByUsername(principal.getName());
+        User user = userService.findByEmail(principal.getName());
         Task task = taskService.findById(taskId);
         TaskUtils.verifyTaskOwner(task, user);
         ChecklistItem checklistItem = findById(checklistItemId);
