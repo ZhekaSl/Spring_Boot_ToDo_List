@@ -43,6 +43,7 @@ public class UserService {
         return Optional.of(userDTO)
                 .map(userMapper::toEntity)
                 .map(user -> {
+                    user.setPassword(passwordEncoder.encode(user.getPassword()));
                     Role userRole = roleService.getUserRole();
                     user.getRoles().add(userRole);
                     return userRepository.save(user);
