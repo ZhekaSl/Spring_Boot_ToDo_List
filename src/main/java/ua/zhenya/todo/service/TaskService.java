@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ua.zhenya.todo.dto.task.TaskCreateRequest;
 import ua.zhenya.todo.mappers.TaskMapper;
@@ -32,24 +33,24 @@ public class TaskService {
                 .orElseThrow(() -> new EntityNotFoundException("Задача с id: " + id + " не найдена!"));
     }
 
-    public Task findByIdAndVerifyOwner(Principal principal, Integer id) {
-        User user = userService.findByEmail(principal.getName());
+    public Task findByIdAndVerifyOwner(String username, Integer id) {
+        User user = userService.findByEmail(username);
         Task task = findById(id);
         TaskUtils.verifyTaskOwner(task, user);
 
         return task;
     }
 
-    public Page<Task> findAll(Principal principal, Pageable pageable) {
-        User user = userService.findByEmail(principal.getName());
+    public Page<Task> findAll(String username, Pageable pageable) {
+        User user = userService.findByEmail(username);
 
         return taskRepository.findAllByUserIdAndParentTaskIsNull(user.getId(), pageable);
     }
 
     @Transactional
-    public Task create(Principal principal, TaskCreateRequest taskCreateRequest) {
+    public Task create(String username, TaskCreateRequest taskCreateRequest) {
 
-        User user = userService.findByEmail(principal.getName());
+        User user = userService.findByEmail(username);
 
         TaskUtils.checkDateIfTimeIsPresent(taskCreateRequest.getTargetDate(), taskCreateRequest.getTargetTime());
         Task task = taskMapper.toEntity(taskCreateRequest);
@@ -59,8 +60,8 @@ public class TaskService {
     }
 
     @Transactional
-    public Task complete(Principal principal, Integer id) {
-        User user = userService.findByEmail(principal.getName());
+    public Task complete(String username, Integer id) {
+        User user = userService.findByEmail(username);
         Task task = findById(id);
         TaskUtils.verifyTaskOwner(task, user);
 
@@ -76,8 +77,8 @@ public class TaskService {
     }
 
     @Transactional
-    public Task update(Principal principal, Integer id, TaskCreateRequest taskUpdateRequest) {
-        User user = userService.findByEmail(principal.getName());
+    public Task update(String username, Integer id, TaskCreateRequest taskUpdateRequest) {
+        User user = userService.findByEmail(username);
         Task task = findById(id);
         TaskUtils.verifyTaskOwner(task, user);
 
@@ -111,8 +112,8 @@ public class TaskService {
 
 
     @Transactional
-    public void delete(Principal principal, Integer id) {
-        User user = userService.findByEmail(principal.getName());
+    public void delete(String username, Integer id) {
+        User user = userService.findByEmail(username);
         Task task = findById(id);
         TaskUtils.verifyTaskOwner(task, user);
         Task parentTask = task.getParentTask();

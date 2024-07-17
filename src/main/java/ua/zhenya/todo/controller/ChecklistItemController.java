@@ -23,27 +23,27 @@ public class ChecklistItemController {
 
     @GetMapping
     public ResponseEntity<PageResponse<ChecklistItemResponse>> findAll(Principal principal, @PathVariable Integer taskId, Pageable pageable) {
-        Page<ChecklistItemResponse> page = checklistItemService.findAll(principal, taskId, pageable)
+        Page<ChecklistItemResponse> page = checklistItemService.findAll(principal.getName(), taskId, pageable)
                 .map(checklistItemMapper::toResponse);
         return ResponseEntity.ok(PageResponse.of(page));
     }
 
     @PostMapping
     public ResponseEntity<ChecklistItemResponse> create(Principal principal, @PathVariable Integer taskId, ChecklistItemCreateRequest checkListItemCreateRequest) {
-        ChecklistItem checklistItem = checklistItemService.create(principal, taskId, checkListItemCreateRequest);
+        ChecklistItem checklistItem = checklistItemService.create(principal.getName(), taskId, checkListItemCreateRequest);
         ChecklistItemResponse checklistItemResponse = checklistItemMapper.toResponse(checklistItem);
         return ResponseEntity.ok(checklistItemResponse);
     }
 
     @DeleteMapping("/{checklistItemId}")
     public ResponseEntity<?> delete(Principal principal, @PathVariable Integer taskId, @PathVariable Integer checklistItemId) {
-        checklistItemService.delete(principal, taskId, checklistItemId);
+        checklistItemService.delete(principal.getName(), taskId, checklistItemId);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/complete")
     public ResponseEntity<ChecklistItemResponse> complete(Principal principal, @PathVariable Integer taskId, @PathVariable Integer id) {
-        ChecklistItem checklistItem = checklistItemService.complete(principal, taskId, id);
+        ChecklistItem checklistItem = checklistItemService.complete(principal.getName(), taskId, id);
         ChecklistItemResponse checklistItemResponse = checklistItemMapper.toResponse(checklistItem);
         return ResponseEntity.ok(checklistItemResponse);
 

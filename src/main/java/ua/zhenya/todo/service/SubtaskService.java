@@ -24,8 +24,8 @@ public class SubtaskService {
     private final TaskMapper taskMapper;
 
     @Transactional
-    public Task create(Principal principal, Integer parentTaskId, TaskCreateRequest createDTO) {
-        User user = userService.findByEmail(principal.getName());
+    public Task create(String username, Integer parentTaskId, TaskCreateRequest createDTO) {
+        User user = userService.findByEmail(username);
         Task parentTask = taskService.findById(parentTaskId);
         TaskUtils.verifyTaskOwner(parentTask, user);
 
@@ -37,8 +37,8 @@ public class SubtaskService {
 
     }
 
-    public Page<Task> findAll(Principal principal, Integer parentTaskId, Pageable pageable) {
-        User user = userService.findByEmail(principal.getName());
+    public Page<Task> findAll(String username, Integer parentTaskId, Pageable pageable) {
+        User user = userService.findByEmail(username);
         Task parentTask = taskService.findById(parentTaskId);
         TaskUtils.verifyTaskOwner(parentTask, user);
 

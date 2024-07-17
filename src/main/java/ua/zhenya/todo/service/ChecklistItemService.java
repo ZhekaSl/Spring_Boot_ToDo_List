@@ -34,8 +34,8 @@ public class ChecklistItemService {
                 .orElseThrow(() -> new EntityNotFoundException("Checklist с id: " + id + " не найден!"));
     }
 
-    public Page<ChecklistItem> findAll(Principal principal, Integer taskId, Pageable pageable) {
-        User user = userService.findByEmail(principal.getName());
+    public Page<ChecklistItem> findAll(String username, Integer taskId, Pageable pageable) {
+        User user = userService.findByEmail(username);
         Task task = taskService.findById(taskId);
         TaskUtils.verifyTaskOwner(task, user);
 
@@ -43,8 +43,8 @@ public class ChecklistItemService {
     }
 
     @Transactional
-    public ChecklistItem create(Principal principal, Integer taskId, ChecklistItemCreateRequest checklistItemCreateRequest) {
-        User user = userService.findByEmail(principal.getName());
+    public ChecklistItem create(String username, Integer taskId, ChecklistItemCreateRequest checklistItemCreateRequest) {
+        User user = userService.findByEmail(username);
         Task task = taskService.findById(taskId);
         TaskUtils.verifyTaskOwner(task, user);
 
@@ -57,8 +57,8 @@ public class ChecklistItemService {
     }
 
     @Transactional
-    public ChecklistItem update(Principal principal, Integer taskId, Integer checklistItemId, ChecklistItemCreateRequest checklistItemCreateRequest) {
-        User user = userService.findByEmail(principal.getName());
+    public ChecklistItem update(String username, Integer taskId, Integer checklistItemId, ChecklistItemCreateRequest checklistItemCreateRequest) {
+        User user = userService.findByEmail(username);
         Task task = taskService.findById(taskId);
         TaskUtils.verifyTaskOwner(task, user);
         ChecklistItem checklistItem = findById(checklistItemId);
@@ -71,8 +71,8 @@ public class ChecklistItemService {
     }
 
     @Transactional
-    public void delete(Principal principal, Integer taskId, Integer checklistItemId) {
-        User user = userService.findByEmail(principal.getName());
+    public void delete(String username, Integer taskId, Integer checklistItemId) {
+        User user = userService.findByEmail(username);
         Task task = taskService.findById(taskId);
         TaskUtils.verifyTaskOwner(task, user);
 
@@ -85,8 +85,8 @@ public class ChecklistItemService {
 
 
     @Transactional
-    public ChecklistItem complete(Principal principal, Integer taskId, Integer checklistItemId) {
-        User user = userService.findByEmail(principal.getName());
+    public ChecklistItem complete(String username, Integer taskId, Integer checklistItemId) {
+        User user = userService.findByEmail(username);
         Task task = taskService.findById(taskId);
         TaskUtils.verifyTaskOwner(task, user);
         ChecklistItem checklistItem = findById(checklistItemId);

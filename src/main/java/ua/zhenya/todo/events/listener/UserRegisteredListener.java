@@ -21,8 +21,6 @@ public class UserRegisteredListener {
         Project inbox = projectService.createInbox(user.getUsername());
 
         projectService.save(inbox);
-
-
     }
 
 

@@ -61,7 +61,6 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь с почтой: " + email + " не был найден!"));
     }
 
-
     @Transactional
     public User update(Integer id, UserUpdateRequest userDTO) {
         return userRepository.findById(id)

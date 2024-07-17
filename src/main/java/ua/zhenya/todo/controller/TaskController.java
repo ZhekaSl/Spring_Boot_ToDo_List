@@ -27,7 +27,7 @@ public class TaskController {
     public PageResponse<TaskResponse> findAll(Principal principal,
                                               Pageable pageable) {
 
-        Page<TaskResponse> page = taskService.findAll(principal, pageable)
+        Page<TaskResponse> page = taskService.findAll(principal.getName(), pageable)
                 .map(taskMapper::toResponse);
         return PageResponse.of(page);
     }
@@ -37,7 +37,7 @@ public class TaskController {
     public ResponseEntity<TaskResponse> findById(Principal principal,
                                                  @PathVariable Integer id) {
         TaskResponse taskResponse = taskMapper
-                .toResponse(taskService.findByIdAndVerifyOwner(principal, id));
+                .toResponse(taskService.findByIdAndVerifyOwner(principal.getName(), id));
 
         return ResponseEntity.ok(taskResponse);
     }
@@ -46,7 +46,7 @@ public class TaskController {
     @PostMapping
     public ResponseEntity<TaskResponse> create(Principal principal,
                                                @Valid @RequestBody TaskCreateRequest taskCreateRequest) {
-        Task task = taskService.create(principal, taskCreateRequest);
+        Task task = taskService.create(principal.getName(), taskCreateRequest);
         TaskResponse taskResponse = taskMapper.toResponse(task);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(taskResponse);
@@ -57,7 +57,7 @@ public class TaskController {
                                                @PathVariable Integer id,
                                                @Valid @RequestBody TaskCreateRequest taskUpdateRequest) {
 
-        Task task = taskService.update(principal, id, taskUpdateRequest);
+        Task task = taskService.update(principal.getName(), id, taskUpdateRequest);
         TaskResponse taskResponse = taskMapper.toResponse(task);
         return ResponseEntity.ok(taskResponse);
     }
@@ -66,7 +66,7 @@ public class TaskController {
     @PatchMapping("/{id}/complete")
     public ResponseEntity<?> complete(Principal principal,
                                       @PathVariable Integer id) {
-        Task task = taskService.complete(principal, id);
+        Task task = taskService.complete(principal.getName(), id);
         TaskResponse taskResponse = taskMapper.toResponse(task);
         return ResponseEntity.ok(taskResponse);
     }
@@ -75,7 +75,7 @@ public class TaskController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(Principal principal,
                                     @PathVariable Integer id) {
-        taskService.delete(principal, id);
+        taskService.delete(principal.getName(), id);
         return ResponseEntity.noContent().build();
     }
 

@@ -6,10 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.zhenya.todo.model.User;
 import ua.zhenya.todo.project.Project;
-import ua.zhenya.todo.project.ProjectPermission;
 import ua.zhenya.todo.repository.ProjectRepository;
-
-import java.security.Principal;
 
 @Service
 @Transactional(readOnly = true)
@@ -32,7 +29,6 @@ public class ProjectService {
                 .isInbox(true)
                 .user(user)
                 .build();
-
         return save(project);
     }
 

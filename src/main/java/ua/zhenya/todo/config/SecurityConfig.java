@@ -18,7 +18,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import ua.zhenya.todo.service.CustomUserDetailsService;
-import ua.zhenya.todo.service.UserService;
 
 @Configuration
 @EnableWebSecurity

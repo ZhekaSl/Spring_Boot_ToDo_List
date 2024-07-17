@@ -25,14 +25,13 @@ public class SubtaskController {
                                                @PathVariable Integer parentTaskId,
                                                @RequestBody TaskCreateRequest createDTO) {
 
-        TaskResponse subtask = taskMapper.toResponse(subtaskService.create(principal, parentTaskId, createDTO));
+        TaskResponse subtask = taskMapper.toResponse(subtaskService.create(principal.getName(), parentTaskId, createDTO));
         return ResponseEntity.ok(subtask);
-
     }
 
     @GetMapping
     public PageResponse<TaskResponse> findAll(Principal principal, @PathVariable Integer parentTaskId, Pageable pageable) {
-        Page<TaskResponse> page = subtaskService.findAll(principal, parentTaskId, pageable)
+        Page<TaskResponse> page = subtaskService.findAll(principal.getName(), parentTaskId, pageable)
                 .map(taskMapper::toResponse);
         return PageResponse.of(page);
     }
