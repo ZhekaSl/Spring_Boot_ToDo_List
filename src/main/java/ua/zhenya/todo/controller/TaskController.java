@@ -26,6 +26,7 @@ public class TaskController {
     @GetMapping
     public PageResponse<TaskResponse> findAll(Principal principal,
                                               Pageable pageable) {
+
         Page<TaskResponse> page = taskService.findAll(principal, pageable)
                 .map(taskMapper::toResponse);
         return PageResponse.of(page);

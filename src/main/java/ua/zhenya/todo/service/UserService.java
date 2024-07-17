@@ -1,6 +1,7 @@
 package ua.zhenya.todo.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.zhenya.todo.dto.user.RegistrationUserRequest;
 import ua.zhenya.todo.dto.user.UserUpdateRequest;
+import ua.zhenya.todo.events.event.UserRegisteredEvent;
 import ua.zhenya.todo.mappers.UserMapper;
 import ua.zhenya.todo.model.Role;
 import ua.zhenya.todo.model.User;
@@ -24,6 +26,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     public Page<User> findAll(Pageable pageable) {
@@ -46,7 +49,9 @@ public class UserService {
                     user.setPassword(passwordEncoder.encode(user.getPassword()));
                     Role userRole = roleService.getUserRole();
                     user.getRoles().add(userRole);
-                    return userRepository.save(user);
+                    User savedUser = userRepository.save(user);
+                    eventPublisher.publishEvent(new UserRegisteredEvent(this, user));
+                    return savedUser;
                 })
                 .orElseThrow(() -> new IllegalArgumentException("Ошибка при создании пользователя!"));
     }
