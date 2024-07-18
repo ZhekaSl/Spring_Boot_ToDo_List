@@ -37,7 +37,7 @@ public class TaskController {
     public ResponseEntity<TaskResponse> findById(Principal principal,
                                                  @PathVariable Integer id) {
         TaskResponse taskResponse = taskMapper
-                .toResponse(taskService.findByIdAndVerifyOwner(principal.getName(), id));
+                .toResponse(taskService.findById(principal.getName(), id));
 
         return ResponseEntity.ok(taskResponse);
     }

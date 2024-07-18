@@ -1,5 +1,6 @@
 package ua.zhenya.todo.utils;
 
+import org.springframework.security.access.AccessDeniedException;
 import ua.zhenya.todo.model.Role;
 import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.model.User;
@@ -16,7 +17,7 @@ public class TaskUtils {
 
     public static void verifyTaskOwner(Task task, User user) {
         if (!task.getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException("Вы не можете этого сделать!");
+            throw new AccessDeniedException("Вы не можете этого сделать!");
         }
     }
 }

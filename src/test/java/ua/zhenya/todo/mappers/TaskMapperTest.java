@@ -13,7 +13,7 @@ class TaskMapperTest {
     private TaskMapper taskMapper;
 
     @Test
-    void shouldProperlyMap() {
+    void shouldProperlyUpdate() {
     }
 
     @Test
@@ -21,7 +21,7 @@ class TaskMapperTest {
     }
 
     @Test
-    void map() {
+    void update() {
     }
 
     @Test

@@ -13,7 +13,7 @@ public interface UserMapper {
     User toEntity(RegistrationUserRequest registrationUserRequest);
 
     @Mapping(target = "password", source = "newPassword")
-    void map(UserUpdateRequest userUpdateRequest, @MappingTarget User user);
+    void update(UserUpdateRequest userUpdateRequest, @MappingTarget User user);
 
     UserResponse toResponse(User user);
 }

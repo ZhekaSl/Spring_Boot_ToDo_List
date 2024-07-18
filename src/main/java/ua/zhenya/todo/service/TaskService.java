@@ -5,9 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ua.zhenya.todo.dto.task.TaskCreateRequest;
 import ua.zhenya.todo.mappers.TaskMapper;
@@ -16,7 +14,6 @@ import ua.zhenya.todo.model.User;
 import ua.zhenya.todo.repository.TaskRepository;
 import ua.zhenya.todo.utils.TaskUtils;
 
-import java.security.Principal;
 import java.time.LocalDateTime;
 
 @Service
@@ -33,7 +30,7 @@ public class TaskService {
                 .orElseThrow(() -> new EntityNotFoundException("Задача с id: " + id + " не найдена!"));
     }
 
-    public Task findByIdAndVerifyOwner(String username, Integer id) {
+    public Task findById(String username, Integer id) {
         User user = userService.findByEmail(username);
         Task task = findById(id);
         TaskUtils.verifyTaskOwner(task, user);
@@ -43,13 +40,11 @@ public class TaskService {
 
     public Page<Task> findAll(String username, Pageable pageable) {
         User user = userService.findByEmail(username);
-
         return taskRepository.findAllByUserIdAndParentTaskIsNull(user.getId(), pageable);
     }
 
     @Transactional
     public Task create(String username, TaskCreateRequest taskCreateRequest) {
-
         User user = userService.findByEmail(username);
 
         TaskUtils.checkDateIfTimeIsPresent(taskCreateRequest.getTargetDate(), taskCreateRequest.getTargetTime());

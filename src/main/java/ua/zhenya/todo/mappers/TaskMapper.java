@@ -3,7 +3,6 @@ package ua.zhenya.todo.mappers;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import ua.zhenya.todo.dto.task.SubtaskResponse;
 import ua.zhenya.todo.dto.task.TaskCreateRequest;
 import ua.zhenya.todo.dto.task.TaskResponse;
 import ua.zhenya.todo.model.Task;
@@ -17,7 +16,7 @@ public interface TaskMapper {
     TaskResponse toResponse(Task task);
 
     Task toEntity(TaskCreateRequest taskCreateRequest);
-    void map(TaskCreateRequest taskCreateRequest, @MappingTarget Task task);
+    void update(TaskCreateRequest taskCreateRequest, @MappingTarget Task task);
     List<TaskResponse> toResponseList(List<Task> tasks);
 
 

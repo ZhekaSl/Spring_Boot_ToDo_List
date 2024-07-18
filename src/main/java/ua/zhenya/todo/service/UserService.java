@@ -68,7 +68,7 @@ public class UserService {
                     if (!passwordEncoder.matches(userDTO.getOldPassword(), foundUser.getPassword())) {
                         throw new IllegalArgumentException("Неверный старый пароль!");
                     }
-                    userMapper.map(userDTO, foundUser);
+                    userMapper.update(userDTO, foundUser);
                     return foundUser;
                 })
                 .map(userRepository::save)
