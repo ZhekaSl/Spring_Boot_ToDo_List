@@ -1,19 +1,24 @@
 package ua.zhenya.todo.mappers;
 
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.*;
 import ua.zhenya.todo.dto.project.ProjectRequest;
+import ua.zhenya.todo.dto.project.ProjectResponse;
 import ua.zhenya.todo.project.Project;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface ProjectMapper {
 
     Project toEntity(ProjectRequest projectRequest);
 
-    ProjectRequest toResponse(Project project);
+
+    @Mapping(target = "isInbox", source = "inbox")
+    @Mapping(target = "ownerId", expression = "java(project.getOwner().getId())")
+    ProjectResponse toResponse(Project project);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void update(ProjectRequest projectRequest, @MappingTarget Project project);
+
+    Project toEntity(ProjectResponse projectResponse);
+
+    Project updateWithNull(ProjectResponse projectResponse, @MappingTarget Project project);
 }

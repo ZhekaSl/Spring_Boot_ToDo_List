@@ -41,7 +41,7 @@ public class Project {
     private List<Task> tasks = new ArrayList<>();
 
     @Column(name = "is_inbox", nullable = false)
-    private boolean isInbox;
+    private boolean inbox;
 
     @Column(name = "invite_url_enabled")
     private boolean inviteUrlEnabled;
