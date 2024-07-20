@@ -11,6 +11,8 @@ import ua.zhenya.todo.dto.project.ProjectRequest;
 import ua.zhenya.todo.mappers.ProjectMapper;
 import ua.zhenya.todo.model.User;
 import ua.zhenya.todo.project.Project;
+import ua.zhenya.todo.project.ProjectPermission;
+import ua.zhenya.todo.project.UserProject;
 import ua.zhenya.todo.repository.ProjectRepository;
 
 import java.util.List;
@@ -28,13 +30,21 @@ public class ProjectService {
                 .orElseThrow(() -> new EntityNotFoundException("Проект не найден"));
     }
 
+    public Project findById(String username, Integer projectId) {
+        User user = userService.findByEmail(username);
+        Project project = findById(projectId);
+        verifyProjectOwner(project, user);
+        return projectRepository.findById(projectId)
+                .orElseThrow(() -> new EntityNotFoundException("Проект не найден"));
+    }
+
     @Transactional
     public Project createInbox(String username) {
         User user = userService.findByEmail(username);
 
         Project project = Project.builder()
                 .name("Inbox")
-                .isInbox(true)
+                .inbox(true)
                 .owner(user)
                 .build();
         return save(project);
@@ -45,6 +55,7 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
+    @Transactional
     public Project create(String username, ProjectRequest projectRequest) {
         User user = userService.findByEmail(username);
         Project project = projectMapper.toEntity(projectRequest);
@@ -52,7 +63,7 @@ public class ProjectService {
 
         return save(project);
     }
-
+    @Transactional
     public Project update(String username, Integer id, ProjectRequest projectRequest) {
         User user = userService.findByEmail(username);
         Project project = findById(id);
@@ -63,13 +74,29 @@ public class ProjectService {
 
     }
 
+    @Transactional
+    public void addMember(User user, Project project, ProjectPermission permission) {
+        UserProject userProject = UserProject.builder()
+                .user(user)
+                .project(project)
+                .permission(permission)
+                .build();
+        project.getUserProjects().add(userProject);
+        save(project);
+    }
+    @Transactional
+
     public void delete(String username, Integer id) {
         User user = userService.findByEmail(username);
         Project project = findById(id);
         verifyProjectOwner(project, user);
 
+        if (project.isInbox())
+            throw new UnsupportedOperationException("Нельзя удалить Inbox!");
+
         projectRepository.delete(project);
     }
+
 
     public Page<Project> findAll(String username, Pageable pageable) {
         User user = userService.findByEmail(username);
@@ -81,6 +108,4 @@ public class ProjectService {
             throw new AccessDeniedException("Вы не можете этого сделать!");
         }
     }
-
-
 }

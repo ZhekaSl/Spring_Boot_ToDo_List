@@ -3,6 +3,7 @@ package ua.zhenya.todo.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.zhenya.todo.dto.PageResponse;
@@ -32,7 +33,7 @@ public class ChecklistItemController {
     public ResponseEntity<ChecklistItemResponse> create(Principal principal, @PathVariable Integer taskId, ChecklistItemCreateRequest checkListItemCreateRequest) {
         ChecklistItem checklistItem = checklistItemService.create(principal.getName(), taskId, checkListItemCreateRequest);
         ChecklistItemResponse checklistItemResponse = checklistItemMapper.toResponse(checklistItem);
-        return ResponseEntity.ok(checklistItemResponse);
+        return ResponseEntity.status(HttpStatus.CREATED).body(checklistItemResponse);
     }
 
     @DeleteMapping("/{checklistItemId}")

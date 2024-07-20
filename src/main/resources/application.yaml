@@ -15,6 +15,7 @@ spring:
 logging:
   level:
     org.springframework.security: trace
+    ua.zhenya.todo: debug
 springdoc:
   api-docs:
     path: /v3/api-docs
@@ -23,5 +24,4 @@ springdoc:
 jwt:
   secret: Xvr8ADeKuDBRKAbc0DQMHqx5cHLzLjx65qLCG8GW08YebuKQZjQfUw5JqB8b
   lifetime: 600m
-
 

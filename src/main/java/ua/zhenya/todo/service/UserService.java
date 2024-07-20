@@ -1,6 +1,9 @@
 package ua.zhenya.todo.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +24,7 @@ import java.util.Optional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -46,10 +50,15 @@ public class UserService {
         return Optional.of(userDTO)
                 .map(userMapper::toEntity)
                 .map(user -> {
+                    log.debug("email {}", user.getEmail());
                     user.setPassword(passwordEncoder.encode(user.getPassword()));
+                    log.debug("password {}", user.getPassword());
                     Role userRole = roleService.getUserRole();
+                    log.debug("role {}", userRole.getName());
                     user.getRoles().add(userRole);
+                    log.debug("user roles {}", user.getRoles());
                     User savedUser = userRepository.save(user);
+                    log.debug("email {}, roles {}", user.getEmail(), user.getRoles());
                     eventPublisher.publishEvent(new UserRegisteredEvent(this, user));
                     return savedUser;
                 })

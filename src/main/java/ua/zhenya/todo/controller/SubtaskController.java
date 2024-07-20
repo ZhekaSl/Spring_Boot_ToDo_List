@@ -3,6 +3,7 @@ package ua.zhenya.todo.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.zhenya.todo.dto.PageResponse;
@@ -26,7 +27,7 @@ public class SubtaskController {
                                                @RequestBody TaskCreateRequest createDTO) {
 
         TaskResponse subtask = taskMapper.toResponse(subtaskService.create(principal.getName(), parentTaskId, createDTO));
-        return ResponseEntity.ok(subtask);
+        return ResponseEntity.status(HttpStatus.CREATED).body(subtask);
     }
 
     @GetMapping

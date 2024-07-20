@@ -1,6 +1,8 @@
 package ua.zhenya.todo.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -9,6 +11,8 @@ import org.springframework.security.core.GrantedAuthority;
 @Table(name = "roles")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Role implements GrantedAuthority, BaseEntity<Short> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -10,7 +10,6 @@ public interface ProjectMapper {
 
     Project toEntity(ProjectRequest projectRequest);
 
-
     @Mapping(target = "isInbox", source = "inbox")
     @Mapping(target = "ownerId", expression = "java(project.getOwner().getId())")
     ProjectResponse toResponse(Project project);
@@ -18,7 +17,4 @@ public interface ProjectMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void update(ProjectRequest projectRequest, @MappingTarget Project project);
 
-    Project toEntity(ProjectResponse projectResponse);
-
-    Project updateWithNull(ProjectResponse projectResponse, @MappingTarget Project project);
 }
