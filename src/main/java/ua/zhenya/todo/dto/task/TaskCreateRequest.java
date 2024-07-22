@@ -16,4 +16,5 @@ public class TaskCreateRequest {
     LocalDate targetDate;
     LocalTime targetTime;
     Priority priority;
+    String projectId;
 }

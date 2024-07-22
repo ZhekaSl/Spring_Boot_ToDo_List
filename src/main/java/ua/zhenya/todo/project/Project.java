@@ -1,6 +1,5 @@
 package ua.zhenya.todo.project;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,24 +10,16 @@ import ua.zhenya.todo.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
-@Table(name = "projects", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"name", "user_id"})
-})
+@Table(name = "projects")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Project {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
-    @Column(nullable = false)
-    private String name;
-
-    private String color;
+@PrimaryKeyJoinColumn(name = "id")
+public class Project extends BaseProject {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -38,10 +29,7 @@ public class Project {
     private List<UserProject> userProjects = new ArrayList<>();
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Task> tasks = new ArrayList<>();
-
-    @Column(name = "is_inbox", nullable = false)
-    private boolean inbox;
+    private List<Invitation> invitations = new ArrayList<>();
 
     @Column(name = "invite_url_enabled")
     private boolean inviteUrlEnabled;
@@ -52,6 +40,9 @@ public class Project {
     @Column(name = "approval_required")
     private boolean approvalRequired;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Invitation> invitations = new ArrayList<>();
+    @Override
+    @PrePersist
+    protected void generateId() {
+        this.setId(UUID.randomUUID().toString().replace("-", "").substring(0, 24));
+    }
 }

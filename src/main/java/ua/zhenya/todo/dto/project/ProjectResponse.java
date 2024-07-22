@@ -9,11 +9,11 @@ public class ProjectResponse {
     Integer id;
     String name;
     String color;
-    Integer ownerId;
+/*    Integer ownerId;
     boolean isInbox;
     boolean inviteUrlEnabled;
     boolean approvalRequired;
-    ProjectPermission defaultPermission;
+    ProjectPermission defaultPermission;*/
 
 
 }

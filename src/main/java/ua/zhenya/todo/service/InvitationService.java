@@ -19,7 +19,7 @@ import ua.zhenya.todo.repository.InvitationRepository;
 import java.util.Objects;
 import java.util.Optional;
 
-@Service
+/*@Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class InvitationService {
@@ -94,4 +94,4 @@ public class InvitationService {
         }
     }
 
-}
+}*/

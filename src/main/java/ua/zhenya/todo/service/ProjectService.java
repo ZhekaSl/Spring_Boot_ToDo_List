@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ua.zhenya.todo.dto.project.ProjectRequest;
 import ua.zhenya.todo.mappers.ProjectMapper;
 import ua.zhenya.todo.model.User;
+import ua.zhenya.todo.project.Inbox;
 import ua.zhenya.todo.project.Project;
 import ua.zhenya.todo.project.ProjectPermission;
 import ua.zhenya.todo.project.UserProject;
@@ -17,7 +18,7 @@ import ua.zhenya.todo.repository.ProjectRepository;
 
 import java.util.List;
 
-@Service
+/*@Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ProjectService {
@@ -39,15 +40,15 @@ public class ProjectService {
     }
 
     @Transactional
-    public Project createInbox(String username) {
+    public void createInbox(String username) {
         User user = userService.findByEmail(username);
 
-        Project project = Project.builder()
-                .name("Inbox")
-                .inbox(true)
-                .owner(user)
-                .build();
-        return save(project);
+        Inbox inbox = new Inbox();
+        inbox.setOwner(user);
+        inbox.setColor("#000000");
+        inbox.setName("Inbox");
+
+
     }
 
     @Transactional
@@ -91,8 +92,6 @@ public class ProjectService {
         Project project = findById(id);
         verifyProjectOwner(project, user);
 
-        if (project.isInbox())
-            throw new UnsupportedOperationException("Нельзя удалить Inbox!");
 
         projectRepository.delete(project);
     }
@@ -108,4 +107,4 @@ public class ProjectService {
             throw new AccessDeniedException("Вы не можете этого сделать!");
         }
     }
-}
+}*/

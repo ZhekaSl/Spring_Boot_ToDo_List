@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ua.zhenya.todo.project.BaseProject;
 import ua.zhenya.todo.project.Project;
 
 import java.time.LocalDate;
@@ -39,7 +40,7 @@ public class Task implements BaseEntity<Integer> {
 
     @ManyToOne
     @JoinColumn(name = "project_id")
-    private Project project;
+    private BaseProject project;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

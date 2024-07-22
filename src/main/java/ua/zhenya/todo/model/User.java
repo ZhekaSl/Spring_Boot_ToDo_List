@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import ua.zhenya.todo.project.Inbox;
 import ua.zhenya.todo.project.Invitation;
 import ua.zhenya.todo.project.Project;
 import ua.zhenya.todo.project.UserProject;
@@ -32,6 +33,8 @@ public class User implements BaseEntity<Integer>, UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Task> tasks = new ArrayList<>();
 
+    @OneToOne(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Inbox inbox;
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Project> projects = new ArrayList<>();
 

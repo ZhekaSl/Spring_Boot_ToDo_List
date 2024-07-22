@@ -11,6 +11,9 @@ import ua.zhenya.todo.dto.task.TaskCreateRequest;
 import ua.zhenya.todo.mappers.TaskMapper;
 import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.model.User;
+import ua.zhenya.todo.project.BaseProject;
+import ua.zhenya.todo.project.Project;
+import ua.zhenya.todo.repository.BaseProjectRepository;
 import ua.zhenya.todo.repository.TaskRepository;
 import ua.zhenya.todo.utils.TaskUtils;
 
@@ -23,6 +26,7 @@ import java.time.LocalDateTime;
 public class TaskService {
     private final TaskRepository taskRepository;
     private final UserService userService;
+    private final BaseProjectRepository<BaseProject> baseProjectRepository;
     private final TaskMapper taskMapper;
 
     public Task findById(Integer id) {
@@ -46,9 +50,12 @@ public class TaskService {
     @Transactional
     public Task create(String username, TaskCreateRequest taskCreateRequest) {
         User user = userService.findByEmail(username);
+        BaseProject baseProject = baseProjectRepository.findById(taskCreateRequest.getProjectId())
+                .orElseThrow(() -> new EntityNotFoundException("Проект не найден!"));
 
         TaskUtils.checkDateIfTimeIsPresent(taskCreateRequest.getTargetDate(), taskCreateRequest.getTargetTime());
         Task task = taskMapper.toEntity(taskCreateRequest);
+        task.setProject(baseProject);
 
         user.addTask(task);
         return taskRepository.save(task);

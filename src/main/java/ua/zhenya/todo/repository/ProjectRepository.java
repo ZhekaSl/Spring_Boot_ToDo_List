@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import ua.zhenya.todo.project.Project;
 
 @Repository
-public interface ProjectRepository extends JpaRepository<Project, Integer> {
+public interface ProjectRepository extends BaseProjectRepository<Project> {
     Page<Project> findByOwnerId(Integer ownerId, Pageable pageable);
 }
