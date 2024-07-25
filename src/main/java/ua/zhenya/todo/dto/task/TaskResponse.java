@@ -20,6 +20,7 @@ public class TaskResponse {
     LocalDateTime completedDateTime;
     Priority priority;
     Integer parentId;
+    String projectId;
     Integer creatorId;
     List<ChecklistItemResponse> checklistItems;
     List<SubtaskResponse> subtasks;

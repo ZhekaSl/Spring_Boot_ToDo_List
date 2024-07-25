@@ -7,5 +7,4 @@ import ua.zhenya.todo.project.ProjectPermission;
 public class InvitationCreateRequest {
     String toEmail;
     ProjectPermission permission;
-
 }

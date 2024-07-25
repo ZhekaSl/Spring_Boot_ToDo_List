@@ -9,10 +9,11 @@ import ua.zhenya.todo.dto.task.TaskCreateRequest;
 import ua.zhenya.todo.mappers.TaskMapper;
 import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.model.User;
+import ua.zhenya.todo.project.BaseProject;
+import ua.zhenya.todo.project.Project;
+import ua.zhenya.todo.project.ProjectPermission;
 import ua.zhenya.todo.repository.TaskRepository;
 import ua.zhenya.todo.utils.TaskUtils;
-
-import java.security.Principal;
 
 @Service
 @RequiredArgsConstructor
@@ -22,26 +23,26 @@ public class SubtaskService {
     private final TaskRepository taskRepository;
     private final UserService userService;
     private final TaskMapper taskMapper;
+    private final BaseProjectService baseProjectService;
 
+    @HasPermission(ProjectPermission.WRITE)
     @Transactional
     public Task create(String username, Integer parentTaskId, TaskCreateRequest createDTO) {
         User user = userService.findByEmail(username);
         Task parentTask = taskService.findById(parentTaskId);
-        TaskUtils.verifyTaskOwner(parentTask, user);
-
+        BaseProject baseProject = baseProjectService.findById(createDTO.getProjectId());
         Task subtask = taskMapper.toEntity(createDTO);
 
         user.addTask(subtask);
         parentTask.addSubtask(subtask);
+        baseProject.addTask(subtask);
         return taskRepository.save(subtask);
 
     }
 
+    @HasPermission(ProjectPermission.READ)
     public Page<Task> findAll(String username, Integer parentTaskId, Pageable pageable) {
-        User user = userService.findByEmail(username);
         Task parentTask = taskService.findById(parentTaskId);
-        TaskUtils.verifyTaskOwner(parentTask, user);
-
-        return taskRepository.findAllByParentTaskId(parentTaskId, pageable);
+        return taskRepository.findAllByParentTask(parentTask, pageable);
     }
 }

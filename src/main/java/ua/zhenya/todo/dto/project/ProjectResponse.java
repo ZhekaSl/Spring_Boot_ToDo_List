@@ -6,14 +6,13 @@ import ua.zhenya.todo.project.ProjectPermission;
 
 @Value
 public class ProjectResponse {
-    Integer id;
+    String id;
     String name;
     String color;
-/*    Integer ownerId;
-    boolean isInbox;
+    Integer ownerId;
     boolean inviteUrlEnabled;
     boolean approvalRequired;
-    ProjectPermission defaultPermission;*/
+    ProjectPermission defaultPermission;
 
 
 }

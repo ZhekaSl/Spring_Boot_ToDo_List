@@ -3,6 +3,8 @@ package ua.zhenya.todo.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,15 +13,13 @@ import ua.zhenya.todo.events.event.InvitationAcceptedEvent;
 import ua.zhenya.todo.events.event.InvitationRejectedEvent;
 import ua.zhenya.todo.mappers.InvitationMapper;
 import ua.zhenya.todo.model.User;
-import ua.zhenya.todo.project.Invitation;
-import ua.zhenya.todo.project.InvitationStatus;
-import ua.zhenya.todo.project.Project;
+import ua.zhenya.todo.project.*;
 import ua.zhenya.todo.repository.InvitationRepository;
 
 import java.util.Objects;
 import java.util.Optional;
 
-/*@Service
+@Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class InvitationService {
@@ -35,8 +35,9 @@ public class InvitationService {
     }
 
     @Transactional
-    public Invitation createInvitation(String fromUserUsername, Integer projectId, InvitationCreateRequest invitationCreateRequest) {
-        User fromUser = userService.findByEmail(fromUserUsername);
+    @OwnerAccess
+    public Invitation create(String username, String projectId, InvitationCreateRequest invitationCreateRequest) {
+        User fromUser = userService.findByEmail(username);
         User toUser = userService.findByEmail(invitationCreateRequest.getToEmail());
         Project project = projectService.findById(projectId);
 
@@ -58,17 +59,29 @@ public class InvitationService {
         return invitationRepository.save(invitation);
     }
 
-    @Transactional
-    public void acceptInvitation(String username, Integer invitationId) {
-        processInvitationResponse(username, invitationId, InvitationStatus.APPROVED);
+    @HasPermission(ProjectPermission.READ)
+    public Page<Invitation> findAllByProject(String username, String projectId, Pageable pageable) {
+        Project project = projectService.findById(projectId);
+        return invitationRepository.findAllByProject(project, pageable);
+    }
+
+    public Page<Invitation> findAllByToUser(String username, Pageable pageable) {
+        User user = userService.findByEmail(username);
+        return invitationRepository.findAllByToUser(user, pageable);
     }
 
     @Transactional
-    public void rejectInvitation(String username, Integer invitationId) {
-        processInvitationResponse(username, invitationId, InvitationStatus.REJECTED);
+    public void accept(String username, Integer invitationId) {
+        processResponse(username, invitationId, InvitationStatus.APPROVED);
+
     }
 
-    private void processInvitationResponse(String username, Integer invitationId, InvitationStatus status) {
+    @Transactional
+    public void reject(String username, Integer invitationId) {
+        processResponse(username, invitationId, InvitationStatus.REJECTED);
+    }
+
+    private void processResponse(String username, Integer invitationId, InvitationStatus status) {
         User user = userService.findByEmail(username);
         Invitation invitation = findById(invitationId);
 
@@ -76,12 +89,8 @@ public class InvitationService {
             throw new AccessDeniedException("Это приглашение послано не Вам!");
         }
 
-        if (invitation.getStatus() == InvitationStatus.APPROVED && status == InvitationStatus.APPROVED) {
-            throw new UnsupportedOperationException("Вы уже приняли данное приглашение!");
-        }
-
-        if (invitation.getStatus() == InvitationStatus.REJECTED && status == InvitationStatus.REJECTED) {
-            throw new UnsupportedOperationException("Вы уже отклонили данное приглашение!");
+        if (invitation.getStatus() == InvitationStatus.APPROVED || invitation.getStatus() == InvitationStatus.REJECTED) {
+            throw new UnsupportedOperationException("Вы уже обработали это приглашение ранее!");
         }
 
         invitation.setStatus(status);
@@ -94,4 +103,4 @@ public class InvitationService {
         }
     }
 
-}*/
+}

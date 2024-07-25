@@ -9,6 +9,8 @@ public class InvitationResponse {
     Integer id;
     String fromEmail;
     String toEmail;
+    String projectId;
+    String projectName;
     InvitationStatus status;
     ProjectPermission permission;
 }

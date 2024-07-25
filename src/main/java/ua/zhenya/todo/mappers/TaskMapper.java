@@ -11,11 +11,13 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {ChecklistItemMapper.class, SubtaskMapper.class})
 public interface TaskMapper {
+    @Mapping(target = "projectId", expression = "java(task.getProject().getId())")
     @Mapping(target = "creatorId", expression = "java(task.getUser().getId())")
     @Mapping(target = "parentId", expression = "java(task.getParentTask() != null ? task.getParentTask().getId() : null)")
     TaskResponse toResponse(Task task);
 
     Task toEntity(TaskCreateRequest taskCreateRequest);
+
     void update(TaskCreateRequest taskCreateRequest, @MappingTarget Task task);
     List<TaskResponse> toResponseList(List<Task> tasks);
 

@@ -4,107 +4,119 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.zhenya.todo.dto.project.ProjectRequest;
 import ua.zhenya.todo.mappers.ProjectMapper;
 import ua.zhenya.todo.model.User;
-import ua.zhenya.todo.project.Inbox;
-import ua.zhenya.todo.project.Project;
-import ua.zhenya.todo.project.ProjectPermission;
-import ua.zhenya.todo.project.UserProject;
+import ua.zhenya.todo.project.*;
 import ua.zhenya.todo.repository.ProjectRepository;
+import ua.zhenya.todo.repository.UserProjectRepository;
+import ua.zhenya.todo.utils.TaskUtils;
 
-import java.util.List;
+import java.util.Objects;
 
-/*@Service
+@Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ProjectService {
+    //    private final BaseProjectRepository<Project> baseProjectRepository;
     private final ProjectRepository projectRepository;
     private final UserService userService;
     private final ProjectMapper projectMapper;
+    private final UserProjectRepository userProjectRepository;
 
-    public Project findById(Integer projectId) {
+    public Project findById(String projectId) {
         return projectRepository.findById(projectId)
-                .orElseThrow(() -> new EntityNotFoundException("Проект не найден"));
+                .orElseThrow(() -> new EntityNotFoundException("Проект с айди: " + projectId + " не найден!"));
     }
 
-    public Project findById(String username, Integer projectId) {
-        User user = userService.findByEmail(username);
-        Project project = findById(projectId);
-        verifyProjectOwner(project, user);
-        return projectRepository.findById(projectId)
-                .orElseThrow(() -> new EntityNotFoundException("Проект не найден"));
-    }
-
-    @Transactional
-    public void createInbox(String username) {
-        User user = userService.findByEmail(username);
-
-        Inbox inbox = new Inbox();
-        inbox.setOwner(user);
-        inbox.setColor("#000000");
-        inbox.setName("Inbox");
+    @HasPermission(ProjectPermission.READ)
+    public Project findById(String username, String projectId) {
+        return findById(projectId);
 
 
     }
 
-    @Transactional
+
     public Project save(Project project) {
         return projectRepository.save(project);
     }
 
     @Transactional
-    public Project create(String username, ProjectRequest projectRequest) {
+    public Project create(String username, ProjectRequest request) {
         User user = userService.findByEmail(username);
-        Project project = projectMapper.toEntity(projectRequest);
+
+        Project project = projectMapper.toEntity(request);
         project.setOwner(user);
 
         return save(project);
     }
+
     @Transactional
-    public Project update(String username, Integer id, ProjectRequest projectRequest) {
-        User user = userService.findByEmail(username);
+    @HasPermission(ProjectPermission.WRITE)
+    public Project update(String username, String id, ProjectRequest projectRequest) {
         Project project = findById(id);
-        verifyProjectOwner(project, user);
         projectMapper.update(projectRequest, project);
 
         return save(project);
-
     }
 
     @Transactional
-    public void addMember(User user, Project project, ProjectPermission permission) {
+    @OwnerAccess
+    public void addMember(String username, String projectId, Integer id, ProjectPermission permission) {
+        User user = userService.findById(id);
+        Project project = findById(projectId);
+
+        UserProjectId userProjectId = new UserProjectId(user.getId(), project.getId());
         UserProject userProject = UserProject.builder()
+                .id(userProjectId)
                 .user(user)
                 .project(project)
                 .permission(permission)
                 .build();
-        project.getUserProjects().add(userProject);
+        project.addUser(userProject);
         save(project);
     }
+
+
     @Transactional
-
-    public void delete(String username, Integer id) {
+    @OwnerAccess
+    public void delete(String username, String projectId) {
         User user = userService.findByEmail(username);
-        Project project = findById(id);
-        verifyProjectOwner(project, user);
-
-
+        Project project = findById(projectId);
+        TaskUtils.verifyProjectOwner(project, user);
         projectRepository.delete(project);
     }
 
-
     public Page<Project> findAll(String username, Pageable pageable) {
         User user = userService.findByEmail(username);
-        return projectRepository.findByOwnerId(user.getId(), pageable);
+        return projectRepository.findAllByUserId(user.getId(), pageable);
     }
 
-    private void verifyProjectOwner(Project project, User user) {
-        if (!project.getOwner().equals(user)) {
-            throw new AccessDeniedException("Вы не можете этого сделать!");
-        }
+    @HasPermission(ProjectPermission.READ)
+    public Page<UserProject> findAllMembers(String username, String projectId, Pageable pageable) {
+        User user = userService.findByEmail(username);
+        Project project = findById(projectId);
+        TaskUtils.verifyProjectAccess(project, user);
+
+        return userProjectRepository.findAllByProject(project, pageable);
     }
-}*/
+
+    @Transactional
+    @OwnerAccess
+    public void removeMember(String username, String projectId, Integer userId) {
+        Project project = findById(projectId);
+        User member = userService.findById(userId);
+
+        if (Objects.equals(project.getOwner(), member)) {
+            throw new UnsupportedOperationException("Владелец проекта не может удалить из проекта самого себя!");
+        }
+
+        UserProject userProject = userProjectRepository.findByProjectAndUser(project, member)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь не является участником проекта"));
+
+        project.removeUser(userProject);
+        save(project);
+    }
+}

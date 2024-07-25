@@ -3,15 +3,13 @@ package ua.zhenya.todo.project;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ua.zhenya.todo.model.User;
 
 @Entity
 @Table(name = "invitations")
 @Data
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -23,14 +21,17 @@ public class Invitation {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "from_user_id", nullable = false)
+    @ToString.Exclude
     private User fromUser;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "to_user_id", nullable = false)
+    @ToString.Exclude
     private User toUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)
+    @ToString.Exclude
     private Project project;
 
     @Enumerated(EnumType.STRING)

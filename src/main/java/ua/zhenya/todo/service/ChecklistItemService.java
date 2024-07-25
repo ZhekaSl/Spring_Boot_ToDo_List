@@ -13,10 +13,9 @@ import ua.zhenya.todo.mappers.ChecklistItemMapper;
 import ua.zhenya.todo.model.ChecklistItem;
 import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.model.User;
+import ua.zhenya.todo.project.ProjectPermission;
 import ua.zhenya.todo.repository.ChecklistItemRepository;
 import ua.zhenya.todo.utils.TaskUtils;
-
-import java.security.Principal;
 
 @Service
 @RequiredArgsConstructor
@@ -24,29 +23,25 @@ import java.security.Principal;
 public class ChecklistItemService {
     private final ChecklistItemRepository checklistItemRepository;
     private final TaskService taskService;
-    private final UserService userService;
     private final ChecklistItemMapper checklistItemMapper;
     private final ApplicationEventPublisher eventPublisher;
-
 
     public ChecklistItem findById(Integer id) {
         return checklistItemRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Checklist с id: " + id + " не найден!"));
     }
 
+    @HasPermission(ProjectPermission.READ)
     public Page<ChecklistItem> findAll(String username, Integer taskId, Pageable pageable) {
-        User user = userService.findByEmail(username);
         Task task = taskService.findById(taskId);
-        TaskUtils.verifyTaskOwner(task, user);
 
-        return checklistItemRepository.findAllByTaskId(taskId, pageable);
+        return checklistItemRepository.findAllByTask(task, pageable);
     }
 
     @Transactional
+    @HasPermission(ProjectPermission.WRITE)
     public ChecklistItem create(String username, Integer taskId, ChecklistItemCreateRequest checklistItemCreateRequest) {
-        User user = userService.findByEmail(username);
         Task task = taskService.findById(taskId);
-        TaskUtils.verifyTaskOwner(task, user);
 
         TaskUtils.checkDateIfTimeIsPresent(checklistItemCreateRequest.getTargetDate(), checklistItemCreateRequest.getTargetTime());
 
@@ -57,10 +52,9 @@ public class ChecklistItemService {
     }
 
     @Transactional
+    @HasPermission(ProjectPermission.WRITE)
     public ChecklistItem update(String username, Integer taskId, Integer checklistItemId, ChecklistItemCreateRequest checklistItemCreateRequest) {
-        User user = userService.findByEmail(username);
         Task task = taskService.findById(taskId);
-        TaskUtils.verifyTaskOwner(task, user);
         ChecklistItem checklistItem = findById(checklistItemId);
         checkTaskContainsChecklistItem(task, checklistItem);
 
@@ -71,24 +65,9 @@ public class ChecklistItemService {
     }
 
     @Transactional
-    public void delete(String username, Integer taskId, Integer checklistItemId) {
-        User user = userService.findByEmail(username);
-        Task task = taskService.findById(taskId);
-        TaskUtils.verifyTaskOwner(task, user);
-
-        ChecklistItem checklistItem = findById(checklistItemId);
-        checkTaskContainsChecklistItem(task, checklistItem);
-
-        task.removeChecklistItem(checklistItem);
-        checklistItemRepository.delete(checklistItem);
-    }
-
-
-    @Transactional
+    @HasPermission(ProjectPermission.WRITE)
     public ChecklistItem complete(String username, Integer taskId, Integer checklistItemId) {
-        User user = userService.findByEmail(username);
         Task task = taskService.findById(taskId);
-        TaskUtils.verifyTaskOwner(task, user);
         ChecklistItem checklistItem = findById(checklistItemId);
         checkTaskContainsChecklistItem(task, checklistItem);
         checklistItem.setCompleted(!checklistItem.isCompleted());
@@ -98,6 +77,18 @@ public class ChecklistItemService {
         eventPublisher.publishEvent(new ChecklistItemStatusUpdatedEvent(this, updatedChecklistItem));
 
         return updatedChecklistItem;
+    }
+
+    @Transactional
+    @HasPermission(ProjectPermission.WRITE)
+    public void delete(String username, Integer taskId, Integer checklistItemId) {
+        Task task = taskService.findById(taskId);
+
+        ChecklistItem checklistItem = findById(checklistItemId);
+        checkTaskContainsChecklistItem(task, checklistItem);
+
+        task.removeChecklistItem(checklistItem);
+        checklistItemRepository.delete(checklistItem);
     }
 
     private static void checkTaskContainsChecklistItem(Task task, ChecklistItem checklistItem) {

@@ -2,10 +2,9 @@ package ua.zhenya.todo.project;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ua.zhenya.todo.model.Task;
+import lombok.ToString;
 import ua.zhenya.todo.model.User;
 
 import java.util.ArrayList;
@@ -15,9 +14,9 @@ import java.util.UUID;
 @Entity
 @Table(name = "projects")
 @Data
+@ToString(exclude = {"owner", "userProjects", "invitations"}, callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @PrimaryKeyJoinColumn(name = "id")
 public class Project extends BaseProject {
 
@@ -44,5 +43,15 @@ public class Project extends BaseProject {
     @PrePersist
     protected void generateId() {
         this.setId(UUID.randomUUID().toString().replace("-", "").substring(0, 24));
+    }
+
+    public void addUser(UserProject userProject) {
+        this.userProjects.add(userProject);
+        userProject.setProject(this);
+    }
+
+    public void removeUser(UserProject userProject) {
+        this.userProjects.remove(userProject);
+        userProject.setProject(null);
     }
 }

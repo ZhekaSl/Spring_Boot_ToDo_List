@@ -1,16 +1,10 @@
 package ua.zhenya.todo.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ua.zhenya.todo.project.Inbox;
-import ua.zhenya.todo.project.Invitation;
-import ua.zhenya.todo.project.Project;
-import ua.zhenya.todo.project.UserProject;
+import ua.zhenya.todo.project.*;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -19,6 +13,7 @@ import java.util.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Builder
 @Table(name = "users")
 public class User implements BaseEntity<Integer>, UserDetails {
@@ -31,20 +26,26 @@ public class User implements BaseEntity<Integer>, UserDetails {
     private LocalDate birthDate;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private List<Task> tasks = new ArrayList<>();
 
     @OneToOne(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private Inbox inbox;
+
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private List<Project> projects = new ArrayList<>();
 
     @OneToMany(mappedBy = "fromUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private List<Invitation> sentInvitations = new ArrayList<>();
 
     @OneToMany(mappedBy = "toUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private List<Invitation> receivedInvitations = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private List<UserProject> userProjects = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -62,6 +63,21 @@ public class User implements BaseEntity<Integer>, UserDetails {
     public void removeTask(Task task) {
         this.tasks.remove(task);
         task.setUser(null);
+    }
+
+    public void addInbox(Inbox inbox) {
+        this.inbox = inbox;
+        inbox.setOwner(this);
+    }
+
+    public void addProject(Project project) {
+        this.projects.add(project);
+        project.setOwner(this);
+    }
+
+    public void removeProject(Project project) {
+        this.projects.remove(project);
+        project.setOwner(null);
     }
 
     @Override

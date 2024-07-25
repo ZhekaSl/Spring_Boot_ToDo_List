@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import ua.zhenya.todo.dto.PageResponse;
 import ua.zhenya.todo.dto.task.TaskCreateRequest;
@@ -22,6 +23,7 @@ public class SubtaskController {
     private final TaskMapper taskMapper;
 
     @PostMapping
+    @Transactional
     public ResponseEntity<TaskResponse> create(Principal principal,
                                                @PathVariable Integer parentTaskId,
                                                @RequestBody TaskCreateRequest createDTO) {

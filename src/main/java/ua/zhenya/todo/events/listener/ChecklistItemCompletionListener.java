@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class ChecklistItemCompletionListener {
     private final TaskRepository taskRepository;
 
-    @EventListener
+    @EventListener()
     @Transactional
     public void handleChecklistItemComplete(ChecklistItemStatusUpdatedEvent event) {
         ChecklistItem checklistItem = event.getChecklistItem();

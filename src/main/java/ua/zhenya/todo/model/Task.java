@@ -1,10 +1,7 @@
 package ua.zhenya.todo.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ua.zhenya.todo.project.BaseProject;
 import ua.zhenya.todo.project.Project;
 
@@ -19,6 +16,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Builder
 public class Task implements BaseEntity<Integer> {
     @Id
@@ -36,6 +34,7 @@ public class Task implements BaseEntity<Integer> {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_task_id")
+    @ToString.Exclude
     private Task parentTask;
 
     @ManyToOne
@@ -44,6 +43,7 @@ public class Task implements BaseEntity<Integer> {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @ToString.Exclude
     private User user;
 
     @OneToMany(mappedBy = "parentTask", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)

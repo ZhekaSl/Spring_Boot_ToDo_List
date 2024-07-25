@@ -1,6 +1,6 @@
 spring:
-  profiles:
-    active: test
+#  profiles:
+#    active: test
   datasource:
     url: jdbc:postgresql://localhost:7766/todo_DB
     username: todolist_user
