@@ -45,10 +45,15 @@ public class InvitationService {
             throw new IllegalArgumentException("Нельзя пригласить владельца проекта.");
         }
 
-        Optional<Invitation> existingInvitation = invitationRepository.findByProjectAndToUser(project, toUser);
-        if (existingInvitation.isPresent() && (existingInvitation.get().getStatus() == InvitationStatus.PENDING
-                                               || existingInvitation.get().getStatus() == InvitationStatus.APPROVED)) {
-            throw new IllegalArgumentException("Пользователь уже приглашен или является участником проекта.");
+        boolean isUserMember = project.getUserProjects().stream()
+                .anyMatch(up -> up.getUser().equals(toUser));
+        if (isUserMember) {
+            throw new IllegalArgumentException("Пользователь уже является участником проекта.");
+        }
+
+        boolean pendingInvitationExists = invitationRepository.existsPendingInvitation(project, toUser);
+        if (pendingInvitationExists) {
+            throw new IllegalArgumentException("Пользователь уже приглашен в проект.");
         }
 
         Invitation invitation = invitationMapper.toEntity(invitationCreateRequest);
