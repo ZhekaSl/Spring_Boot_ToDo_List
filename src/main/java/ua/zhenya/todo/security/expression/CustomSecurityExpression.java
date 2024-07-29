@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.model.User;
 import ua.zhenya.todo.project.BaseProject;
@@ -20,6 +21,7 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CustomSecurityExpression {
     private final UserService userService;
     private final TaskService taskService;
