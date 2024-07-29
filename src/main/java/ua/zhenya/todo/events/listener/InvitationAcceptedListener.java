@@ -17,6 +17,6 @@ public class InvitationAcceptedListener {
     @Transactional
     public void handleInvitationAcceptedEvent(InvitationAcceptedEvent event) {
         Invitation invitation = event.getInvitation();
-        projectService.addMember(invitation.getFromUser().getEmail(), invitation.getProject().getId(), invitation.getToUser().getId(), invitation.getPermission());
+        projectService.addMember(invitation.getProject().getId(), invitation.getToUser().getId(), invitation.getPermission());
     }
 }

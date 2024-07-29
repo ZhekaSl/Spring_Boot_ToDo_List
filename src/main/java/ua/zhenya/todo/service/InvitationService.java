@@ -35,9 +35,8 @@ public class InvitationService {
     }
 
     @Transactional
-    @OwnerAccess
-    public Invitation create(String username, String projectId, InvitationCreateRequest invitationCreateRequest) {
-        User fromUser = userService.findByEmail(username);
+    public Invitation create(Integer fromUserId, String projectId, InvitationCreateRequest invitationCreateRequest) {
+        User fromUser = userService.findById(fromUserId);
         User toUser = userService.findByEmail(invitationCreateRequest.getToEmail());
         Project project = projectService.findById(projectId);
 
@@ -64,30 +63,29 @@ public class InvitationService {
         return invitationRepository.save(invitation);
     }
 
-    @HasPermission(ProjectPermission.READ)
-    public Page<Invitation> findAllByProject(String username, String projectId, Pageable pageable) {
+    public Page<Invitation> findAllByProject(String projectId, Pageable pageable) {
         Project project = projectService.findById(projectId);
         return invitationRepository.findAllByProject(project, pageable);
     }
 
-    public Page<Invitation> findAllByToUser(String username, Pageable pageable) {
-        User user = userService.findByEmail(username);
+    public Page<Invitation> findAllByToUser(Integer userId, Pageable pageable) {
+        User user = userService.findById(userId);
         return invitationRepository.findAllByToUser(user, pageable);
     }
 
     @Transactional
-    public void accept(String username, Integer invitationId) {
-        processResponse(username, invitationId, InvitationStatus.APPROVED);
+    public void accept(Integer userId, Integer invitationId) {
+        processResponse(userId, invitationId, InvitationStatus.APPROVED);
 
     }
 
     @Transactional
-    public void reject(String username, Integer invitationId) {
-        processResponse(username, invitationId, InvitationStatus.REJECTED);
+    public void reject(Integer userId, Integer invitationId) {
+        processResponse(userId, invitationId, InvitationStatus.REJECTED);
     }
 
-    private void processResponse(String username, Integer invitationId, InvitationStatus status) {
-        User user = userService.findByEmail(username);
+    private void processResponse(Integer userId, Integer invitationId, InvitationStatus status) {
+        User user = userService.findById(userId);
         Invitation invitation = findById(invitationId);
 
         if (!Objects.equals(invitation.getToUser().getId(), user.getId())) {

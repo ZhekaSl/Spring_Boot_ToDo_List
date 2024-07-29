@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ua.zhenya.todo.dto.PageResponse;
 import ua.zhenya.todo.dto.project.ProjectRequest;
@@ -13,9 +15,8 @@ import ua.zhenya.todo.dto.user.UserProjectResponse;
 import ua.zhenya.todo.mappers.ProjectMapper;
 import ua.zhenya.todo.mappers.UserProjectMapper;
 import ua.zhenya.todo.project.Project;
+import ua.zhenya.todo.security.JwtUserDetails;
 import ua.zhenya.todo.service.ProjectService;
-
-import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/v1/projects")
@@ -26,46 +27,52 @@ public class ProjectController {
     private final UserProjectMapper userProjectMapper;
 
     @PostMapping
-    public ResponseEntity<ProjectResponse> create(Principal principal, @RequestBody ProjectRequest projectRequest) {
-        Project project = projectService.create(principal.getName(), projectRequest);
+    public ResponseEntity<ProjectResponse> create(@AuthenticationPrincipal JwtUserDetails jwtUserDetails, @RequestBody ProjectRequest projectRequest) {
+        Project project = projectService.create(jwtUserDetails.getId(), projectRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(projectMapper.toResponse(project));
     }
 
+    @PreAuthorize("@customSecurityExpression.canAccessProject(#id)")
     @GetMapping("/{id}")
-    public ResponseEntity<ProjectResponse> findById(Principal principal, @PathVariable String id) {
-        Project project = projectService.findById(principal.getName(), id);
+    public ResponseEntity<ProjectResponse> findById(@PathVariable String id) {
+        Project project = projectService.findById(id);
         return ResponseEntity.ok(projectMapper.toResponse(project));
     }
 
+
     @GetMapping
-    public ResponseEntity<PageResponse<ProjectResponse>> findAll(Principal principal, Pageable pageable) {
-        Page<ProjectResponse> page = projectService.findAll(principal.getName(), pageable)
+    public ResponseEntity<PageResponse<ProjectResponse>> findAll(@AuthenticationPrincipal JwtUserDetails jwtUserDetails, Pageable pageable) {
+        Page<ProjectResponse> page = projectService.findAll(jwtUserDetails.getId(), pageable)
                 .map(projectMapper::toResponse);
         return ResponseEntity.ok(PageResponse.of(page));
     }
 
+    @PreAuthorize("@customSecurityExpression.projectOwner(#jwtUserDetails.id, #id)")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(Principal principal, @PathVariable String id) {
-        projectService.delete(principal.getName(), id);
+    public ResponseEntity<?> delete(@AuthenticationPrincipal JwtUserDetails jwtUserDetails, @PathVariable String id) {
+        projectService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("@customSecurityExpression.canAccessProject(#id)")
     @GetMapping("/{id}/members")
-    public ResponseEntity<PageResponse<UserProjectResponse>> findAllMembers(Principal principal, @PathVariable String id, Pageable pageable) {
-        Page<UserProjectResponse> page = projectService.findAllMembers(principal.getName(), id, pageable)
+    public ResponseEntity<PageResponse<UserProjectResponse>> findAllMembers(@PathVariable String id, Pageable pageable) {
+        Page<UserProjectResponse> page = projectService.findAllMembers(id, pageable)
                 .map(userProjectMapper::toResponse);
         return ResponseEntity.ok(PageResponse.of(page));
     }
 
+    @PreAuthorize("@customSecurityExpression.projectOwner(#jwtUserDetails.id, #id)")
     @DeleteMapping("/{id}/members/{userId}")
-    public ResponseEntity<?> removeMember(Principal principal, @PathVariable String id, @PathVariable Integer userId) {
-        projectService.removeMember(principal.getName(), id, userId);
+    public ResponseEntity<?> removeMember(@AuthenticationPrincipal JwtUserDetails jwtUserDetails, @PathVariable String id, @PathVariable Integer userId) {
+        projectService.removeMember(id, userId);
         return ResponseEntity.noContent().build();
     }
 
-/*    @PutMapping("/{id}")
-    public ResponseEntity<ProjectResponse> update(Principal principal, @PathVariable Integer id, @RequestBody ProjectRequest projectRequest) {
-        Project project = projectService.update(principal.getName(), id, projectRequest);
+    @PreAuthorize("@customSecurityExpression.canModifyProject(id)")
+    @PutMapping("/{id}")
+    public ResponseEntity<ProjectResponse> update(@AuthenticationPrincipal JwtUserDetails jwtUserDetails,  @PathVariable String id, @RequestBody ProjectRequest projectRequest) {
+        Project project = projectService.update(id, projectRequest);
         return ResponseEntity.ok(projectMapper.toResponse(project));
-    }*/
+    }
 }

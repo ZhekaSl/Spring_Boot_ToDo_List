@@ -6,41 +6,52 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ua.zhenya.todo.dto.user.JwtResponse;
-import ua.zhenya.todo.dto.user.LoginUserRequest;
+import ua.zhenya.todo.dto.user.LoginRequest;
 import ua.zhenya.todo.dto.user.RegistrationUserRequest;
 import ua.zhenya.todo.exception.ErrorResponse;
+import ua.zhenya.todo.model.User;
+import ua.zhenya.todo.security.JwtResponse;
+import ua.zhenya.todo.security.JwtTokenProvider;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
     private final UserService userService;
-    private final CustomUserDetailsService userDetailsService;
-    private final JwtTokenService jwtTokenService;
     private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public ResponseEntity<?> createAuthToken(LoginUserRequest loginUserRequest) {
+    public JwtResponse login(LoginRequest loginRequest) {
         try {
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginUserRequest.getEmail(), loginUserRequest.getPassword()));
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         } catch (BadCredentialsException e) {
-            return new ResponseEntity<>(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Неправильный логин или пароль!"), HttpStatus.UNAUTHORIZED);
+            throw new BadCredentialsException("Неправильный логин или пароль!");
         }
-        UserDetails userDetails = userDetailsService.loadUserByUsername(loginUserRequest.getEmail());
-
-        String token = jwtTokenService.generateToken(userDetails);
-        return ResponseEntity.ok(new JwtResponse(token));
+        JwtResponse jwtResponse = new JwtResponse();
+        User user = userService.findByEmail(loginRequest.getUsername());
+        jwtResponse.setId(user.getId());
+        jwtResponse.setUsername(user.getEmail());
+        jwtResponse.setAccessToken(jwtTokenProvider.createAccessToken(
+                user.getId(), user.getEmail(), user.getRoles()
+        ));
+        jwtResponse.setRefreshToken(jwtTokenProvider.createRefreshToken(
+                user.getId(), user.getEmail()
+        ));
+        return jwtResponse;
     }
 
-    public ResponseEntity<?> createUser(RegistrationUserRequest registrationUserRequest) {
+    public User register(RegistrationUserRequest registrationUserRequest) {
         try {
             userService.findByEmail(registrationUserRequest.getEmail());
-            return new ResponseEntity<>(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Пользователь с указанным email уже существует!"), HttpStatus.BAD_REQUEST);
+            throw new IllegalArgumentException("Пользователь с указанным email уже существует!");
         } catch (UsernameNotFoundException e) {
-            return ResponseEntity.ok(userService.create(registrationUserRequest));
+            return userService.create(registrationUserRequest);
         }
+    }
+
+    public JwtResponse refresh(String refreshToken) {
+        return jwtTokenProvider.refreshToken(refreshToken);
     }
 }

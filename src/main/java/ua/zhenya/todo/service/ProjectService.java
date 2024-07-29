@@ -31,12 +31,6 @@ public class ProjectService {
                 .orElseThrow(() -> new EntityNotFoundException("Проект с айди: " + projectId + " не найден!"));
     }
 
-    @HasPermission(ProjectPermission.READ)
-    public Project findById(String username, String projectId) {
-        return findById(projectId);
-
-
-    }
 
 
     public Project save(Project project) {
@@ -44,8 +38,8 @@ public class ProjectService {
     }
 
     @Transactional
-    public Project create(String username, ProjectRequest request) {
-        User user = userService.findByEmail(username);
+    public Project create(Integer userId, ProjectRequest request) {
+        User user = userService.findById(userId);
 
         Project project = projectMapper.toEntity(request);
         project.setOwner(user);
@@ -54,8 +48,7 @@ public class ProjectService {
     }
 
     @Transactional
-    @HasPermission(ProjectPermission.WRITE)
-    public Project update(String username, String id, ProjectRequest projectRequest) {
+    public Project update(String id, ProjectRequest projectRequest) {
         Project project = findById(id);
         projectMapper.update(projectRequest, project);
 
@@ -63,9 +56,8 @@ public class ProjectService {
     }
 
     @Transactional
-    @OwnerAccess
-    public void addMember(String username, String projectId, Integer id, ProjectPermission permission) {
-        User user = userService.findById(id);
+    public void addMember(String projectId, Integer userId, ProjectPermission permission) {
+        User user = userService.findById(userId);
         Project project = findById(projectId);
 
         UserProjectId userProjectId = new UserProjectId(user.getId(), project.getId());
@@ -81,31 +73,25 @@ public class ProjectService {
 
 
     @Transactional
-    @OwnerAccess
-    public void delete(String username, String projectId) {
-        User user = userService.findByEmail(username);
+    public void delete(String projectId) {
         Project project = findById(projectId);
-        TaskUtils.verifyProjectOwner(project, user);
         projectRepository.delete(project);
     }
 
-    public Page<Project> findAll(String username, Pageable pageable) {
-        User user = userService.findByEmail(username);
+    public Page<Project> findAll(Integer userId, Pageable pageable) {
+        User user = userService.findById(userId);
         return projectRepository.findAllByUserId(user.getId(), pageable);
     }
 
-    @HasPermission(ProjectPermission.READ)
-    public Page<UserProject> findAllMembers(String username, String projectId, Pageable pageable) {
-        User user = userService.findByEmail(username);
+    
+    public Page<UserProject> findAllMembers(String projectId, Pageable pageable) {
         Project project = findById(projectId);
-        TaskUtils.verifyProjectAccess(project, user);
 
         return userProjectRepository.findAllByProject(project, pageable);
     }
 
     @Transactional
-    @OwnerAccess
-    public void removeMember(String username, String projectId, Integer userId) {
+    public void removeMember(String projectId, Integer userId) {
         Project project = findById(projectId);
         User member = userService.findById(userId);
 

@@ -26,4 +26,9 @@ springdoc:
 jwt:
   secret: Xvr8ADeKuDBRKAbc0DQMHqx5cHLzLjx65qLCG8GW08YebuKQZjQfUw5JqB8b
   lifetime: 600m
+security:
+  jwt:
+    secret: fjsdkfjs;dJGFKsdjgfks;jkg&?fjsdkfj;gj"JKASDJGDSKGdjkfs=fjdskf42daj
+    access: 1800000
+    refresh: 2592000000
 

@@ -21,27 +21,22 @@ import ua.zhenya.todo.utils.TaskUtils;
 public class SubtaskService {
     private final TaskService taskService;
     private final TaskRepository taskRepository;
-    private final UserService userService;
     private final TaskMapper taskMapper;
     private final BaseProjectService baseProjectService;
 
-    @HasPermission(ProjectPermission.WRITE)
     @Transactional
-    public Task create(String username, Integer parentTaskId, TaskCreateRequest createDTO) {
-        User user = userService.findByEmail(username);
+    public Task create(Integer parentTaskId, TaskCreateRequest createDTO) {
         Task parentTask = taskService.findById(parentTaskId);
         BaseProject baseProject = baseProjectService.findById(createDTO.getProjectId());
         Task subtask = taskMapper.toEntity(createDTO);
 
-        user.addTask(subtask);
+        parentTask.getUser().addTask(subtask);
         parentTask.addSubtask(subtask);
         baseProject.addTask(subtask);
         return taskRepository.save(subtask);
-
     }
 
-    @HasPermission(ProjectPermission.READ)
-    public Page<Task> findAll(String username, Integer parentTaskId, Pageable pageable) {
+    public Page<Task> findAll(Integer parentTaskId, Pageable pageable) {
         Task parentTask = taskService.findById(parentTaskId);
         return taskRepository.findAllByParentTask(parentTask, pageable);
     }

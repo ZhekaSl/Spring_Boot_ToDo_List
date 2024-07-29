@@ -15,8 +15,6 @@ import ua.zhenya.todo.project.*;
 import ua.zhenya.todo.repository.ChecklistItemRepository;
 import ua.zhenya.todo.repository.TaskRepository;
 
-import java.security.Principal;
-
 @Aspect
 @Component
 @RequiredArgsConstructor
@@ -27,7 +25,6 @@ public class PermissionAspect {
     private final ProjectService projectService;
     private final BaseProjectService baseProjectService;
     private final TaskRepository taskRepository;
-    private final ChecklistItemRepository checklistItemRepository;
 
     @Before("@annotation(hasPermission) && args(username, projectId, ..) && this(projectServ)")
     public void checkProjectPermission(HasPermission hasPermission, String username, String projectId, Object projectServ) {

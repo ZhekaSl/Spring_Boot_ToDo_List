@@ -37,7 +37,6 @@ public class InboxService {
     }
 
     @Transactional
-    @OwnerAccess
     public String update(String username, String color) {
         User user = userService.findByEmail(username);
         Inbox inbox = user.getInbox();
@@ -45,5 +44,4 @@ public class InboxService {
         saveInbox(inbox);
         return inbox.getColor();
     }
-
 }

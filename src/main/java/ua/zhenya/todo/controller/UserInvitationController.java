@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ua.zhenya.todo.dto.PageResponse;
 import ua.zhenya.todo.dto.invitation.InvitationResponse;
 import ua.zhenya.todo.mappers.InvitationMapper;
 import ua.zhenya.todo.project.Invitation;
+import ua.zhenya.todo.security.JwtUserDetails;
 import ua.zhenya.todo.service.InvitationService;
 
 import java.security.Principal;
@@ -21,21 +23,21 @@ public class UserInvitationController {
     private final InvitationMapper invitationMapper;
 
     @GetMapping
-    public ResponseEntity<PageResponse<InvitationResponse>> findAllByUser(Principal principal, Pageable pageable) {
-        Page<Invitation> invitations = invitationService.findAllByToUser(principal.getName(), pageable);
+    public ResponseEntity<PageResponse<InvitationResponse>> findAllByUser(@AuthenticationPrincipal JwtUserDetails jwtUserDetails, Pageable pageable) {
+        Page<Invitation> invitations = invitationService.findAllByToUser(jwtUserDetails.getId(), pageable);
         Page<InvitationResponse> page = invitations.map(invitationMapper::toResponse);
         return ResponseEntity.ok(PageResponse.of(page));
     }
 
     @PostMapping("/{invitationId}/accept")
-    public ResponseEntity<Void> acceptInvitation(Principal principal, @PathVariable Integer invitationId) {
-        invitationService.accept(principal.getName(), invitationId);
+    public ResponseEntity<Void> acceptInvitation(@AuthenticationPrincipal JwtUserDetails jwtUserDetails, @PathVariable Integer invitationId) {
+        invitationService.accept(jwtUserDetails.getId(), invitationId);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{invitationId}/reject")
-    public ResponseEntity<Void> rejectInvitation(Principal principal, @PathVariable Integer invitationId) {
-        invitationService.reject(principal.getName(), invitationId);
+    public ResponseEntity<Void> rejectInvitation(@AuthenticationPrincipal JwtUserDetails jwtUserDetails, @PathVariable Integer invitationId) {
+        invitationService.reject(jwtUserDetails.getId(), invitationId);
         return ResponseEntity.ok().build();
     }
 }

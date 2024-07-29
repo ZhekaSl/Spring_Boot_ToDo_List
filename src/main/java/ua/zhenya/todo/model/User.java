@@ -16,7 +16,7 @@ import java.util.*;
 @ToString
 @Builder
 @Table(name = "users")
-public class User implements BaseEntity<Integer>, UserDetails {
+public class User implements BaseEntity<Integer> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -79,16 +79,5 @@ public class User implements BaseEntity<Integer>, UserDetails {
         this.projects.remove(project);
         project.setOwner(null);
     }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles;
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
 
 }

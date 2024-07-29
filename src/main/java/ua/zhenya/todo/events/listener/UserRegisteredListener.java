@@ -17,8 +17,7 @@ public class UserRegisteredListener {
     @Transactional
     public void handleCreateInboxForNewUser(UserRegisteredEvent event) {
         User user = event.getUser();
-        inboxService.create(user.getUsername());
+        inboxService.create(user.getEmail());
     }
-
 
 }

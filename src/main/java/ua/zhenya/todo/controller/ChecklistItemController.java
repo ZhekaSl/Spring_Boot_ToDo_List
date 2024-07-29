@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ua.zhenya.todo.dto.PageResponse;
 import ua.zhenya.todo.dto.checklist.ChecklistItemCreateRequest;
@@ -22,29 +23,33 @@ public class ChecklistItemController {
     private final ChecklistItemService checklistItemService;
     private final ChecklistItemMapper checklistItemMapper;
 
+    @PreAuthorize("@customSecurityExpression.canAccessTask(#taskId)")
     @GetMapping
-    public ResponseEntity<PageResponse<ChecklistItemResponse>> findAll(Principal principal, @PathVariable Integer taskId, Pageable pageable) {
-        Page<ChecklistItemResponse> page = checklistItemService.findAll(principal.getName(), taskId, pageable)
+    public ResponseEntity<PageResponse<ChecklistItemResponse>> findAll(@PathVariable Integer taskId, Pageable pageable) {
+        Page<ChecklistItemResponse> page = checklistItemService.findAll(taskId, pageable)
                 .map(checklistItemMapper::toResponse);
         return ResponseEntity.ok(PageResponse.of(page));
     }
 
+    @PreAuthorize("@customSecurityExpression.canModifyTask(#taskId)")
     @PostMapping
-    public ResponseEntity<ChecklistItemResponse> create(Principal principal, @PathVariable Integer taskId, ChecklistItemCreateRequest checkListItemCreateRequest) {
-        ChecklistItem checklistItem = checklistItemService.create(principal.getName(), taskId, checkListItemCreateRequest);
+    public ResponseEntity<ChecklistItemResponse> create(@PathVariable Integer taskId, ChecklistItemCreateRequest checkListItemCreateRequest) {
+        ChecklistItem checklistItem = checklistItemService.create(taskId, checkListItemCreateRequest);
         ChecklistItemResponse checklistItemResponse = checklistItemMapper.toResponse(checklistItem);
         return ResponseEntity.status(HttpStatus.CREATED).body(checklistItemResponse);
     }
 
+    @PreAuthorize("@customSecurityExpression.canModifyTask(#taskId)")
     @DeleteMapping("/{checklistItemId}")
-    public ResponseEntity<?> delete(Principal principal, @PathVariable Integer taskId, @PathVariable Integer checklistItemId) {
-        checklistItemService.delete(principal.getName(), taskId, checklistItemId);
+    public ResponseEntity<?> delete(@PathVariable Integer taskId, @PathVariable Integer checklistItemId) {
+        checklistItemService.delete(taskId, checklistItemId);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("@customSecurityExpression.canModifyTask(#taskId)")
     @PatchMapping("/{id}/complete")
-    public ResponseEntity<ChecklistItemResponse> complete(Principal principal, @PathVariable Integer taskId, @PathVariable Integer id) {
-        ChecklistItem checklistItem = checklistItemService.complete(principal.getName(), taskId, id);
+    public ResponseEntity<ChecklistItemResponse> complete(@PathVariable Integer taskId, @PathVariable Integer id) {
+        ChecklistItem checklistItem = checklistItemService.complete(taskId, id);
         ChecklistItemResponse checklistItemResponse = checklistItemMapper.toResponse(checklistItem);
         return ResponseEntity.ok(checklistItemResponse);
 

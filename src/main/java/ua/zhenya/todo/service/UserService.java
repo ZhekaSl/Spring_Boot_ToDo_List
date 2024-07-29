@@ -7,6 +7,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,8 +21,11 @@ import ua.zhenya.todo.dto.user.UserUpdateRequest;
 import ua.zhenya.todo.events.event.UserRegisteredEvent;
 import ua.zhenya.todo.mappers.UserMapper;
 import ua.zhenya.todo.model.Role;
+import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.model.User;
 import ua.zhenya.todo.repository.UserRepository;
+import ua.zhenya.todo.security.JwtResponse;
+import ua.zhenya.todo.security.JwtUserDetails;
 
 import java.util.Optional;
 
@@ -50,15 +58,10 @@ public class UserService {
         return Optional.of(userDTO)
                 .map(userMapper::toEntity)
                 .map(user -> {
-                    log.debug("email {}", user.getEmail());
                     user.setPassword(passwordEncoder.encode(user.getPassword()));
-                    log.debug("password {}", user.getPassword());
                     Role userRole = roleService.getUserRole();
-                    log.debug("role {}", userRole.getName());
                     user.getRoles().add(userRole);
-                    log.debug("user roles {}", user.getRoles());
                     User savedUser = userRepository.save(user);
-                    log.debug("email {}, roles {}", user.getEmail(), user.getRoles());
                     eventPublisher.publishEvent(new UserRegisteredEvent(this, user));
                     return savedUser;
                 })
@@ -82,6 +85,19 @@ public class UserService {
                 })
                 .map(userRepository::save)
                 .orElseThrow(() -> new IllegalArgumentException("Пользователь с id: " + id + " не найден!"));
+    }
+
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AccessDeniedException("User is not authenticated");
+        }
+
+        UserDetails userDetails = (JwtUserDetails) authentication.getPrincipal();
+        String username = userDetails.getUsername();
+
+        return findByEmail(username);
     }
 
     @Transactional

@@ -33,23 +33,14 @@ public class TaskService {
                 .orElseThrow(() -> new EntityNotFoundException("Задача с id: " + id + " не найдена!"));
     }
 
-    @HasPermission(ProjectPermission.READ)
-    public Task findById(String username, Integer id) {
-        return findById(id);
-    }
-
-    @HasPermission(ProjectPermission.READ)
-    public Page<Task> findAll(String username, Pageable pageable) {
-        User user = userService.findByEmail(username);
-        return taskRepository.findAllByUserIdAndParentTaskIsNull(user.getId(), pageable);
+    public Page<Task> findAll(Integer userId, Pageable pageable) {
+        return taskRepository.findAllByUserIdAndParentTaskIsNull(userId, pageable);
     }
 
     @Transactional
-    @HasPermission(ProjectPermission.WRITE)
-    public Task create(String username, TaskCreateRequest taskCreateRequest) {
-        User user = userService.findByEmail(username);
+    public Task create(Integer userId, TaskCreateRequest taskCreateRequest) {
+        User user = userService.findById(userId);
         BaseProject baseProject = baseProjectService.findById(taskCreateRequest.getProjectId());
-/*        TaskUtils.verifyProjectOwner(baseProject, user);*/
 
         TaskUtils.checkDateIfTimeIsPresent(taskCreateRequest.getTargetDate(), taskCreateRequest.getTargetTime());
         Task task = taskMapper.toEntity(taskCreateRequest);
@@ -59,8 +50,7 @@ public class TaskService {
     }
 
     @Transactional
-    @HasPermission(ProjectPermission.WRITE)
-    public Task complete(String username, Integer id) {
+    public Task complete(Integer id) {
         Task task = findById(id);
 
         task.setCompleted(!task.isCompleted());
@@ -74,9 +64,9 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    @HasPermission(ProjectPermission.WRITE)
+
     @Transactional
-    public Task update(String username, Integer id, TaskCreateRequest taskUpdateRequest) {
+    public Task update(Integer id, TaskCreateRequest taskUpdateRequest) {
         Task task = findById(id);
 
         if (taskUpdateRequest.getName() != null && !taskUpdateRequest.getName().equals(task.getName())) {
@@ -107,18 +97,16 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-
-    @HasPermission(ProjectPermission.WRITE)
     @Transactional
-    public void delete(String username, Integer id) {
-        User user = userService.findByEmail(username);
+    public void delete(Integer id) {
         Task task = findById(id);
         Task parentTask = task.getParentTask();
         if (parentTask != null) {
             parentTask.removeSubtask(task);
         }
-        user.removeTask(task);
+        task.getUser().removeTask(task);
 
         taskRepository.delete(task);
     }
+
 }

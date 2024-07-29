@@ -31,16 +31,16 @@ public class ChecklistItemService {
                 .orElseThrow(() -> new EntityNotFoundException("Checklist с id: " + id + " не найден!"));
     }
 
-    @HasPermission(ProjectPermission.READ)
-    public Page<ChecklistItem> findAll(String username, Integer taskId, Pageable pageable) {
+
+    public Page<ChecklistItem> findAll(Integer taskId, Pageable pageable) {
         Task task = taskService.findById(taskId);
 
         return checklistItemRepository.findAllByTask(task, pageable);
     }
 
     @Transactional
-    @HasPermission(ProjectPermission.WRITE)
-    public ChecklistItem create(String username, Integer taskId, ChecklistItemCreateRequest checklistItemCreateRequest) {
+
+    public ChecklistItem create(Integer taskId, ChecklistItemCreateRequest checklistItemCreateRequest) {
         Task task = taskService.findById(taskId);
 
         TaskUtils.checkDateIfTimeIsPresent(checklistItemCreateRequest.getTargetDate(), checklistItemCreateRequest.getTargetTime());
@@ -52,8 +52,8 @@ public class ChecklistItemService {
     }
 
     @Transactional
-    @HasPermission(ProjectPermission.WRITE)
-    public ChecklistItem update(String username, Integer taskId, Integer checklistItemId, ChecklistItemCreateRequest checklistItemCreateRequest) {
+
+    public ChecklistItem update(Integer taskId, Integer checklistItemId, ChecklistItemCreateRequest checklistItemCreateRequest) {
         Task task = taskService.findById(taskId);
         ChecklistItem checklistItem = findById(checklistItemId);
         checkTaskContainsChecklistItem(task, checklistItem);
@@ -65,8 +65,8 @@ public class ChecklistItemService {
     }
 
     @Transactional
-    @HasPermission(ProjectPermission.WRITE)
-    public ChecklistItem complete(String username, Integer taskId, Integer checklistItemId) {
+
+    public ChecklistItem complete(Integer taskId, Integer checklistItemId) {
         Task task = taskService.findById(taskId);
         ChecklistItem checklistItem = findById(checklistItemId);
         checkTaskContainsChecklistItem(task, checklistItem);
@@ -80,8 +80,8 @@ public class ChecklistItemService {
     }
 
     @Transactional
-    @HasPermission(ProjectPermission.WRITE)
-    public void delete(String username, Integer taskId, Integer checklistItemId) {
+
+    public void delete(Integer taskId, Integer checklistItemId) {
         Task task = taskService.findById(taskId);
 
         ChecklistItem checklistItem = findById(checklistItemId);
