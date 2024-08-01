@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import ua.zhenya.todo.project.*;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -16,7 +17,7 @@ import java.util.*;
 @ToString
 @Builder
 @Table(name = "users")
-public class User implements BaseEntity<Integer> {
+public class User implements BaseEntity<Integer>, Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

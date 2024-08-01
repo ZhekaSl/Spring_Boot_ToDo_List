@@ -17,8 +17,6 @@ import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.security.JwtUserDetails;
 import ua.zhenya.todo.service.TaskService;
 
-import java.security.Principal;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/tasks")
@@ -41,8 +39,7 @@ public class TaskController {
     @GetMapping("/{id}")
     public ResponseEntity<TaskResponse> findById(@PathVariable Integer id) {
         TaskResponse taskResponse = taskMapper
-                .toResponse(taskService.findById(id));
-
+                .toResponse(taskService.findByIdWithDependencies(id));
         return ResponseEntity.ok(taskResponse);
     }
 

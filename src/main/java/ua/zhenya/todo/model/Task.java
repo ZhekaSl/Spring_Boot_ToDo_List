@@ -5,6 +5,7 @@ import lombok.*;
 import ua.zhenya.todo.project.BaseProject;
 import ua.zhenya.todo.project.Project;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -18,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @Builder
-public class Task implements BaseEntity<Integer> {
+public class Task implements BaseEntity<Integer>, Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -46,9 +47,11 @@ public class Task implements BaseEntity<Integer> {
     @ToString.Exclude
     private User user;
 
-    @OneToMany(mappedBy = "parentTask", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "parentTask", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private List<Task> subtasks = new ArrayList<>();
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private List<ChecklistItem> checklistItems = new ArrayList<>();
 
     public void addChecklistItem(ChecklistItem checklistItem) {

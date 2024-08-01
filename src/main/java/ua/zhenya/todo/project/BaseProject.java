@@ -8,6 +8,7 @@ import lombok.ToString;
 import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.model.User;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ import java.util.List;
 @ToString(exclude = {"tasks"})
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class BaseProject {
+public abstract class BaseProject implements Serializable {
     @Id
     private String id;
 

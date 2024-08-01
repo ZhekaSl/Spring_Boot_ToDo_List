@@ -1,6 +1,7 @@
 spring:
-#  profiles:
-#    active: test
+#  cache:
+#    type: redis
+#    cache-names: redis-cache
   datasource:
     url: jdbc:postgresql://localhost:7766/todo_DB
     username: todolist_user

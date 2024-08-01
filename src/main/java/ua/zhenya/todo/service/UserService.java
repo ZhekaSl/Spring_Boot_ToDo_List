@@ -4,6 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,12 +49,17 @@ public class UserService {
         return userRepository.findAll(pageable);
     }
 
+    @Cacheable(value = "users", key = "#id")
     public User findById(Integer id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Пользователь с id: " + id + " не найден!"));
     }
 
     @Transactional
+    @Caching(put = {
+            @CachePut(value = "users", key = "#result.id"),
+            @CachePut(value = "users", key = "#result.email")
+    })
     public User create(RegistrationUserRequest userDTO) {
         if (!userDTO.getPassword().equals(userDTO.getConfirmPassword()))
             throw new IllegalArgumentException("Пароли не совпадают!");
@@ -68,11 +77,16 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Ошибка при создании пользователя!"));
     }
 
+    @Cacheable(value = "users", key = "#email")
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь с почтой: " + email + " не был найден!"));
     }
 
+    @Caching(put = {
+            @CachePut(value = "users", key = "#result.id"),
+            @CachePut(value = "users", key = "#result.email")
+    })
     @Transactional
     public User update(Integer id, UserUpdateRequest userDTO) {
         return userRepository.findById(id)
@@ -87,20 +101,9 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Пользователь с id: " + id + " не найден!"));
     }
 
-    public User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AccessDeniedException("User is not authenticated");
-        }
-
-        UserDetails userDetails = (JwtUserDetails) authentication.getPrincipal();
-        String username = userDetails.getUsername();
-
-        return findByEmail(username);
-    }
 
     @Transactional
+    @CacheEvict(value = "users", key = "#id")
     public boolean delete(Integer id) {
         return userRepository.findById(id)
                 .map(entity -> {

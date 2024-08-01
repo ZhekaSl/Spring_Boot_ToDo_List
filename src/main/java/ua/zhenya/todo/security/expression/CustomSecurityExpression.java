@@ -51,7 +51,7 @@ public class CustomSecurityExpression {
         JwtUserDetails jwtUserDetails = (JwtUserDetails) authentication.getPrincipal();
         Integer id = jwtUserDetails.getId();
 
-        Project project = projectService.findById(projectId);
+        BaseProject project = baseProjectService.findById(projectId);
         return hasPermission(id, project, ProjectPermission.WRITE);
     }
 
@@ -66,7 +66,7 @@ public class CustomSecurityExpression {
         JwtUserDetails jwtUserDetails = (JwtUserDetails) authentication.getPrincipal();
         Integer id = jwtUserDetails.getId();
 
-        Task task = taskService.findById(taskId);
+        Task task = taskService.findByIdWithDependencies(taskId);
         BaseProject baseProject = task.getProject();
         return hasPermission(id, baseProject, ProjectPermission.READ);
     }
@@ -75,8 +75,8 @@ public class CustomSecurityExpression {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         JwtUserDetails jwtUserDetails = (JwtUserDetails) authentication.getPrincipal();
         Integer id = jwtUserDetails.getId();
-        Task task = taskService.findById(taskId);
 
+        Task task = taskService.findById(taskId);
         BaseProject baseProject = baseProjectService.findById(task.getProject().getId());
         return hasPermission(id, baseProject, ProjectPermission.WRITE);
     }

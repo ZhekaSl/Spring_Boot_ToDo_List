@@ -3,6 +3,9 @@ package ua.zhenya.todo.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -12,7 +15,6 @@ import ua.zhenya.todo.mappers.TaskMapper;
 import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.model.User;
 import ua.zhenya.todo.project.BaseProject;
-import ua.zhenya.todo.project.ProjectPermission;
 import ua.zhenya.todo.repository.TaskRepository;
 import ua.zhenya.todo.utils.TaskUtils;
 
@@ -33,11 +35,23 @@ public class TaskService {
                 .orElseThrow(() -> new EntityNotFoundException("Задача с id: " + id + " не найдена!"));
     }
 
+    @Cacheable(value = "tasks", key = "#id")
+    public Task findByIdCached(Integer id) {
+        return findById(id);
+    }
+
+    @Cacheable(value = "tasks", key = "#id")
+    public Task findByIdWithDependencies(Integer id) {
+        return taskRepository.findByIdWithSubtasksAndChecklistItems(id)
+                .orElseThrow(() -> new EntityNotFoundException("Задача с id: " + id + " не найдена!"));
+    }
+
     public Page<Task> findAll(Integer userId, Pageable pageable) {
         return taskRepository.findAllByUserIdAndParentTaskIsNull(userId, pageable);
     }
 
     @Transactional
+    @CachePut(value = "tasks", key = "#result.id")
     public Task create(Integer userId, TaskCreateRequest taskCreateRequest) {
         User user = userService.findById(userId);
         BaseProject baseProject = baseProjectService.findById(taskCreateRequest.getProjectId());
@@ -50,6 +64,7 @@ public class TaskService {
     }
 
     @Transactional
+    @CachePut(value = "tasks", key = "#id")
     public Task complete(Integer id) {
         Task task = findById(id);
 
@@ -66,6 +81,7 @@ public class TaskService {
 
 
     @Transactional
+    @CachePut(value = "tasks", key = "#id")
     public Task update(Integer id, TaskCreateRequest taskUpdateRequest) {
         Task task = findById(id);
 
@@ -98,6 +114,7 @@ public class TaskService {
     }
 
     @Transactional
+    @CacheEvict(value = "tasks", key = "#id")
     public void delete(Integer id) {
         Task task = findById(id);
         Task parentTask = task.getParentTask();
@@ -105,6 +122,7 @@ public class TaskService {
             parentTask.removeSubtask(task);
         }
         task.getUser().removeTask(task);
+        task.getProject().removeTask(task);
 
         taskRepository.delete(task);
     }
