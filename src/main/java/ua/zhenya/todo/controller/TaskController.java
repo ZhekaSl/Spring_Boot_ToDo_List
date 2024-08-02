@@ -39,7 +39,7 @@ public class TaskController {
     @GetMapping("/{id}")
     public ResponseEntity<TaskResponse> findById(@PathVariable Integer id) {
         TaskResponse taskResponse = taskMapper
-                .toResponse(taskService.findByIdWithDependencies(id));
+                .toResponse(taskService.findById(id));
         return ResponseEntity.ok(taskResponse);
     }
 

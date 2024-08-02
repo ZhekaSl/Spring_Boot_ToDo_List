@@ -30,19 +30,14 @@ public class TaskService {
     private final BaseProjectService baseProjectService;
     private final TaskMapper taskMapper;
 
-    public Task findById(Integer id) {
-        return taskRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Задача с id: " + id + " не найдена!"));
-    }
 
     @Cacheable(value = "tasks", key = "#id")
     public Task findByIdCached(Integer id) {
         return findById(id);
     }
 
-    @Cacheable(value = "tasks", key = "#id")
-    public Task findByIdWithDependencies(Integer id) {
-        return taskRepository.findByIdWithSubtasksAndChecklistItems(id)
+    public Task findById(Integer id) {
+        return taskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Задача с id: " + id + " не найдена!"));
     }
 
@@ -95,7 +90,6 @@ public class TaskService {
             if (task.getParentTask() != null) {
                 task.getParentTask().removeSubtask(task);
             }
-
             oldProject.removeTask(task);
             newProject.addTask(task);
         }

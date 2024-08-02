@@ -67,20 +67,16 @@ public class ChecklistItemService {
             checklistItem.setTargetTime(checklistItemCreateRequest.getTargetTime());
         }
 
-
         return checklistItemRepository.save(checklistItem);
     }
 
     @Transactional
-
     public ChecklistItem complete(Integer taskId, Integer checklistItemId) {
         Task task = taskService.findById(taskId);
         ChecklistItem checklistItem = findById(checklistItemId);
         checkTaskContainsChecklistItem(task, checklistItem);
         checklistItem.setCompleted(!checklistItem.isCompleted());
-
         ChecklistItem updatedChecklistItem = checklistItemRepository.save(checklistItem);
-
         eventPublisher.publishEvent(new ChecklistItemStatusUpdatedEvent(this, updatedChecklistItem));
 
         return updatedChecklistItem;
@@ -89,7 +85,6 @@ public class ChecklistItemService {
     @Transactional
     public void delete(Integer taskId, Integer checklistItemId) {
         Task task = taskService.findById(taskId);
-
         ChecklistItem checklistItem = findById(checklistItemId);
         checkTaskContainsChecklistItem(task, checklistItem);
 

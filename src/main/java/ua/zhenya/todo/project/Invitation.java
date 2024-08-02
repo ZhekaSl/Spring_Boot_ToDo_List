@@ -24,7 +24,7 @@ public class Invitation {
     @ToString.Exclude
     private User fromUser;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_user_id", nullable = false)
     @ToString.Exclude
     private User toUser;
@@ -41,4 +41,5 @@ public class Invitation {
     @Enumerated(EnumType.STRING)
     @Column(name = "permission", nullable = false)
     private ProjectPermission permission;
+
 }

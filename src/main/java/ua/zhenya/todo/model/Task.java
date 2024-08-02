@@ -47,9 +47,10 @@ public class Task implements BaseEntity<Integer>, Serializable {
     @ToString.Exclude
     private User user;
 
-    @OneToMany(mappedBy = "parentTask", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "parentTask", cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<Task> subtasks = new ArrayList<>();
+
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<ChecklistItem> checklistItems = new ArrayList<>();

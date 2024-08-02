@@ -31,8 +31,6 @@ public class ProjectService {
                 .orElseThrow(() -> new EntityNotFoundException("Проект с айди: " + projectId + " не найден!"));
     }
 
-
-
     public Project save(Project project) {
         return projectRepository.save(project);
     }
@@ -42,7 +40,7 @@ public class ProjectService {
         User user = userService.findById(userId);
 
         Project project = projectMapper.toEntity(request);
-        project.setOwner(user);
+        user.addProject(project);
 
         return save(project);
     }
@@ -67,7 +65,9 @@ public class ProjectService {
                 .project(project)
                 .permission(permission)
                 .build();
-        project.addUser(userProject);
+
+        userProject.setProject(project);
+        userProject.setUser(user);
         save(project);
     }
 
@@ -75,6 +75,8 @@ public class ProjectService {
     @Transactional
     public void delete(String projectId) {
         Project project = findById(projectId);
+        User user = project.getOwner();
+        user.removeProject(project);
         projectRepository.delete(project);
     }
 
@@ -86,7 +88,6 @@ public class ProjectService {
     
     public Page<UserProject> findAllMembers(String projectId, Pageable pageable) {
         Project project = findById(projectId);
-
         return userProjectRepository.findAllByProject(project, pageable);
     }
 
@@ -102,7 +103,8 @@ public class ProjectService {
         UserProject userProject = userProjectRepository.findByProjectAndUser(project, member)
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь не является участником проекта"));
 
-        project.removeUser(userProject);
+        userProject.removeUser();
+        userProject.removeProject();
         save(project);
     }
 }

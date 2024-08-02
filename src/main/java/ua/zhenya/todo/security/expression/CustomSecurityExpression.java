@@ -51,7 +51,7 @@ public class CustomSecurityExpression {
     public boolean canAccessTask(Integer taskId) {
         Integer id = getCurrentUserId();
 
-        Task task = taskService.findByIdWithDependencies(taskId);
+        Task task = taskService.findById(taskId);
         BaseProject baseProject = task.getProject();
         return hasPermission(id, baseProject, ProjectPermission.READ);
     }

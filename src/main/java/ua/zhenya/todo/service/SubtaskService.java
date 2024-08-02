@@ -28,9 +28,10 @@ public class SubtaskService {
     public Task create(Integer parentTaskId, TaskCreateRequest createDTO) {
         Task parentTask = taskService.findById(parentTaskId);
         BaseProject baseProject = baseProjectService.findById(createDTO.getProjectId());
+        User user = parentTask.getUser();
         Task subtask = taskMapper.toEntity(createDTO);
 
-        parentTask.getUser().addTask(subtask);
+        user.addTask(subtask);
         parentTask.addSubtask(subtask);
         baseProject.addTask(subtask);
         return taskRepository.save(subtask);

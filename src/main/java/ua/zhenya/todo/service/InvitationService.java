@@ -56,9 +56,9 @@ public class InvitationService {
         }
 
         Invitation invitation = invitationMapper.toEntity(invitationCreateRequest);
-        invitation.setFromUser(fromUser);
-        invitation.setToUser(toUser);
-        invitation.setProject(project);
+        fromUser.addSentInvitation(invitation);
+        toUser.addReceivedInvitation(invitation);
+        project.addInvitation(invitation);
 
         return invitationRepository.save(invitation);
     }
@@ -76,7 +76,6 @@ public class InvitationService {
     @Transactional
     public void accept(Integer invitationId) {
         processResponse(invitationId, InvitationStatus.APPROVED);
-
     }
 
     @Transactional

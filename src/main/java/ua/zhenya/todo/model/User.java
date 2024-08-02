@@ -81,4 +81,14 @@ public class User implements BaseEntity<Integer>, Serializable {
         project.setOwner(null);
     }
 
+    public void addReceivedInvitation(Invitation invitation) {
+        this.receivedInvitations.add(invitation);
+        invitation.setToUser(this);
+    }
+
+    public void addSentInvitation(Invitation invitation) {
+        this.sentInvitations.add(invitation);
+        invitation.setToUser(this);
+    }
+
 }

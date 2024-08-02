@@ -14,7 +14,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "projects")
 @Data
-@ToString(exclude = {"owner", "userProjects", "invitations"}, callSuper = true)
+@ToString(callSuper = true, exclude = {"owner", "userProjects", "invitations", "tasks"})
 @NoArgsConstructor
 @AllArgsConstructor
 @PrimaryKeyJoinColumn(name = "id")
@@ -45,13 +45,8 @@ public class Project extends BaseProject {
         this.setId(UUID.randomUUID().toString().replace("-", "").substring(0, 24));
     }
 
-    public void addUser(UserProject userProject) {
-        this.userProjects.add(userProject);
-        userProject.setProject(this);
-    }
-
-    public void removeUser(UserProject userProject) {
-        this.userProjects.remove(userProject);
-        userProject.setProject(null);
+    public void addInvitation(Invitation invitation) {
+        this.invitations.add(invitation);
+        invitation.setProject(this);
     }
 }

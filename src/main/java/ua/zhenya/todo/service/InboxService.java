@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.zhenya.todo.model.User;
-import ua.zhenya.todo.project.OwnerAccess;
 import ua.zhenya.todo.project.Inbox;
 import ua.zhenya.todo.repository.BaseProjectRepository;
 
@@ -18,12 +17,12 @@ public class InboxService {
     @Transactional
     public void create(String username) {
         User user = userService.findByEmail(username);
-
         Inbox inbox = new Inbox();
         inbox.setOwner(user);
         inbox.setColor("#000000");
         inbox.setName("Inbox");
 
+        user.addInbox(inbox);
         saveInbox(inbox);
     }
 

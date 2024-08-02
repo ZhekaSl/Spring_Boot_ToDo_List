@@ -31,7 +31,7 @@ public abstract class BaseProject implements Serializable {
     @Transient
     private User owner;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
     private List<Task> tasks = new ArrayList<>();
 
     protected abstract void generateId();

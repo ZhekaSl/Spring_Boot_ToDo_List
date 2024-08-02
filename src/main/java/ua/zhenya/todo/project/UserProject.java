@@ -28,4 +28,28 @@ public class UserProject {
 
     @Enumerated(EnumType.STRING)
     private ProjectPermission permission;
+
+    public void setUser(User user) {
+        this.user = user;
+        user.getUserProjects().add(this);
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+        project.getUserProjects().add(this);
+    }
+
+    public void removeUser() {
+        if (this.user != null) {
+            this.user.getUserProjects().remove(this);
+            this.user = null;
+        }
+    }
+
+    public void removeProject() {
+        if (this.project != null) {
+            this.project.getUserProjects().remove(this);
+            this.project = null;
+        }
+    }
 }
