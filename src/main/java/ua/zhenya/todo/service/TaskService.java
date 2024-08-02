@@ -92,6 +92,10 @@ public class TaskService {
             BaseProject newProject = baseProjectService.findById(taskUpdateRequest.getProjectId());
             BaseProject oldProject = task.getProject();
 
+            if (task.getParentTask() != null) {
+                task.getParentTask().removeSubtask(task);
+            }
+
             oldProject.removeTask(task);
             newProject.addTask(task);
         }
