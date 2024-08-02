@@ -74,28 +74,22 @@ public class InvitationService {
     }
 
     @Transactional
-    public void accept(Integer userId, Integer invitationId) {
-        processResponse(userId, invitationId, InvitationStatus.APPROVED);
+    public void accept(Integer invitationId) {
+        processResponse(invitationId, InvitationStatus.APPROVED);
 
     }
 
     @Transactional
-    public void reject(Integer userId, Integer invitationId) {
-        processResponse(userId, invitationId, InvitationStatus.REJECTED);
+    public void reject(Integer invitationId) {
+        processResponse(invitationId, InvitationStatus.REJECTED);
     }
 
-    private void processResponse(Integer userId, Integer invitationId, InvitationStatus status) {
-        User user = userService.findById(userId);
+    private void processResponse(Integer invitationId, InvitationStatus status) {
         Invitation invitation = findById(invitationId);
-
-        if (!Objects.equals(invitation.getToUser().getId(), user.getId())) {
-            throw new AccessDeniedException("Это приглашение послано не Вам!");
-        }
 
         if (invitation.getStatus() == InvitationStatus.APPROVED || invitation.getStatus() == InvitationStatus.REJECTED) {
             throw new UnsupportedOperationException("Вы уже обработали это приглашение ранее!");
         }
-
         invitation.setStatus(status);
         invitationRepository.save(invitation);
 

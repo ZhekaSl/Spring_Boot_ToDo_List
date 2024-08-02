@@ -85,14 +85,15 @@ public class TaskService {
     public Task update(Integer id, TaskCreateRequest taskUpdateRequest) {
         Task task = findById(id);
 
-        if (taskUpdateRequest.getName() != null && !taskUpdateRequest.getName().equals(task.getName())) {
-            task.setName(taskUpdateRequest.getName());
-        }
-        if (taskUpdateRequest.getDescription() != null && !taskUpdateRequest.getDescription().equals(task.getDescription())) {
-            task.setDescription(taskUpdateRequest.getDescription());
-        }
-        if (taskUpdateRequest.getPriority() != null && !taskUpdateRequest.getPriority().equals(task.getPriority())) {
-            task.setPriority(taskUpdateRequest.getPriority());
+        taskMapper.update(taskUpdateRequest, task);
+
+        if (taskUpdateRequest.getProjectId() != null &&
+            !taskUpdateRequest.getProjectId().equals(task.getProject().getId())) {
+            BaseProject newProject = baseProjectService.findById(taskUpdateRequest.getProjectId());
+            BaseProject oldProject = task.getProject();
+
+            oldProject.removeTask(task);
+            newProject.addTask(task);
         }
 
         if (taskUpdateRequest.getTargetDate() == null && taskUpdateRequest.getTargetTime() == null) {
@@ -101,14 +102,9 @@ public class TaskService {
         } else {
             if (taskUpdateRequest.getTargetDate() == null) {
                 throw new IllegalArgumentException("Укажите сначала дату!");
-            } else if (!taskUpdateRequest.getTargetDate().equals(task.getTargetDate())) {
-                task.setTargetDate(taskUpdateRequest.getTargetDate());
             }
-            if (taskUpdateRequest.getTargetTime() == null) {
-                task.setTargetTime(null);
-            } else if (!taskUpdateRequest.getTargetTime().equals(task.getTargetTime())) {
-                task.setTargetTime(taskUpdateRequest.getTargetTime());
-            }
+            task.setTargetDate(taskUpdateRequest.getTargetDate());
+            task.setTargetTime(taskUpdateRequest.getTargetTime());
         }
         return taskRepository.save(task);
     }

@@ -1,8 +1,6 @@
 package ua.zhenya.todo.mappers;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 import ua.zhenya.todo.dto.task.TaskCreateRequest;
 import ua.zhenya.todo.dto.task.TaskResponse;
 import ua.zhenya.todo.model.Task;
@@ -18,10 +16,12 @@ public interface TaskMapper {
 
     Task toEntity(TaskCreateRequest taskCreateRequest);
 
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "targetDate", ignore = true)
+    @Mapping(target = "targetTime", ignore = true)
     void update(TaskCreateRequest taskCreateRequest, @MappingTarget Task task);
+
     List<TaskResponse> toResponseList(List<Task> tasks);
-
-
 
 
 }

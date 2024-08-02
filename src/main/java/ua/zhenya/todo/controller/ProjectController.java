@@ -47,7 +47,7 @@ public class ProjectController {
         return ResponseEntity.ok(PageResponse.of(page));
     }
 
-    @PreAuthorize("@customSecurityExpression.isProjectOwner(#jwtUserDetails.id, #id)")
+    @PreAuthorize("@customSecurityExpression.isProjectOwner(#id)")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@AuthenticationPrincipal JwtUserDetails jwtUserDetails, @PathVariable String id) {
         projectService.delete(id);
@@ -62,16 +62,18 @@ public class ProjectController {
         return ResponseEntity.ok(PageResponse.of(page));
     }
 
-    @PreAuthorize("@customSecurityExpression.isProjectOwner(#jwtUserDetails.id, #id)")
+    @PreAuthorize("@customSecurityExpression.isProjectOwner(#id)")
     @DeleteMapping("/{id}/members/{userId}")
-    public ResponseEntity<?> removeMember(@AuthenticationPrincipal JwtUserDetails jwtUserDetails, @PathVariable String id, @PathVariable Integer userId) {
+    public ResponseEntity<?> removeMember(@AuthenticationPrincipal JwtUserDetails jwtUserDetails,
+                                          @PathVariable String id, @PathVariable Integer userId) {
         projectService.removeMember(id, userId);
         return ResponseEntity.noContent().build();
     }
 
     @PreAuthorize("@customSecurityExpression.canModifyProject(id)")
     @PutMapping("/{id}")
-    public ResponseEntity<ProjectResponse> update(@AuthenticationPrincipal JwtUserDetails jwtUserDetails,  @PathVariable String id, @RequestBody ProjectRequest projectRequest) {
+    public ResponseEntity<ProjectResponse> update(@AuthenticationPrincipal JwtUserDetails jwtUserDetails,
+                                                  @PathVariable String id, @RequestBody ProjectRequest projectRequest) {
         Project project = projectService.update(id, projectRequest);
         return ResponseEntity.ok(projectMapper.toResponse(project));
     }

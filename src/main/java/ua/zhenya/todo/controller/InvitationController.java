@@ -16,8 +16,6 @@ import ua.zhenya.todo.project.Invitation;
 import ua.zhenya.todo.security.JwtUserDetails;
 import ua.zhenya.todo.service.InvitationService;
 
-import java.security.Principal;
-
 @RestController
 @RequestMapping("/api/v1/projects/{projectId}/invitations")
 @RequiredArgsConstructor
@@ -25,7 +23,7 @@ public class InvitationController {
     private final InvitationService invitationService;
     private final InvitationMapper invitationMapper;
 
-    @PreAuthorize("@customSecurityExpression.projectOwner(#jwtUserDetails.id, #projectId)")
+    @PreAuthorize("@customSecurityExpression.isProjectOwner(#projectId)")
     @PostMapping
     public ResponseEntity<InvitationResponse> create(@AuthenticationPrincipal JwtUserDetails jwtUserDetails,
                                                      @RequestBody InvitationCreateRequest invitationCreateRequest,

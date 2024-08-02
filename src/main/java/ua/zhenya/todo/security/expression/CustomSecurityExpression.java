@@ -6,16 +6,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.zhenya.todo.model.Task;
-import ua.zhenya.todo.model.User;
-import ua.zhenya.todo.project.BaseProject;
-import ua.zhenya.todo.project.Inbox;
-import ua.zhenya.todo.project.Project;
-import ua.zhenya.todo.project.ProjectPermission;
+import ua.zhenya.todo.project.*;
 import ua.zhenya.todo.security.JwtUserDetails;
-import ua.zhenya.todo.service.BaseProjectService;
-import ua.zhenya.todo.service.ProjectService;
-import ua.zhenya.todo.service.TaskService;
-import ua.zhenya.todo.service.UserService;
+import ua.zhenya.todo.service.*;
 
 import java.util.Objects;
 
@@ -23,48 +16,40 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Transactional
 public class CustomSecurityExpression {
-    private final UserService userService;
     private final TaskService taskService;
     private final ProjectService projectService;
     private final BaseProjectService baseProjectService;
+    private final InvitationService invitationService;
 
     public boolean canAccessUser(Integer userId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        JwtUserDetails jwtUserDetails = (JwtUserDetails) authentication.getPrincipal();
-        Integer id = jwtUserDetails.getId();
+        Integer id = getCurrentUserId();
 
         return Objects.equals(userId, id);
     }
 
     public boolean canAccessProject(String projectId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        JwtUserDetails jwtUserDetails = (JwtUserDetails) authentication.getPrincipal();
-        Integer id = jwtUserDetails.getId();
+        Integer id = getCurrentUserId();
 
         Project project = projectService.findById(projectId);
         return hasPermission(id, project, ProjectPermission.READ);
     }
 
     public boolean canModifyProject(String projectId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        JwtUserDetails jwtUserDetails = (JwtUserDetails) authentication.getPrincipal();
-        Integer id = jwtUserDetails.getId();
+        Integer id = getCurrentUserId();
 
         BaseProject project = baseProjectService.findById(projectId);
         return hasPermission(id, project, ProjectPermission.WRITE);
     }
 
-    public boolean isProjectOwner(Integer id, String projectId) {
-        User user = userService.findById(id);
+    public boolean isProjectOwner(String projectId) {
+        Integer id = getCurrentUserId();
+
         BaseProject project = projectService.findById(projectId);
-        return project.getOwner().equals(user);
+        return project.getOwner().getId().equals(id);
     }
 
     public boolean canAccessTask(Integer taskId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        JwtUserDetails jwtUserDetails = (JwtUserDetails) authentication.getPrincipal();
-        Integer id = jwtUserDetails.getId();
+        Integer id = getCurrentUserId();
 
         Task task = taskService.findByIdWithDependencies(taskId);
         BaseProject baseProject = task.getProject();
@@ -72,13 +57,24 @@ public class CustomSecurityExpression {
     }
 
     public boolean canModifyTask(Integer taskId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        JwtUserDetails jwtUserDetails = (JwtUserDetails) authentication.getPrincipal();
-        Integer id = jwtUserDetails.getId();
+        Integer id = getCurrentUserId();
 
         Task task = taskService.findById(taskId);
-        BaseProject baseProject = baseProjectService.findById(task.getProject().getId());
+        BaseProject baseProject = task.getProject();
         return hasPermission(id, baseProject, ProjectPermission.WRITE);
+    }
+
+    public boolean canChangeInvitationStatus(Integer invitationId) {
+        Integer id = getCurrentUserId();
+
+        Invitation invitation = invitationService.findById(invitationId);
+        return invitation.getToUser().getId().equals(id);
+    }
+
+    private static Integer getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUserDetails = (JwtUserDetails) authentication.getPrincipal();
+        return jwtUserDetails.getId();
     }
 
     private boolean hasPermission(Integer userId, BaseProject baseProject, ProjectPermission permission) {

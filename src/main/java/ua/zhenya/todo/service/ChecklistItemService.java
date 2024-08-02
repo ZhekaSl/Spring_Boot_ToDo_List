@@ -12,8 +12,6 @@ import ua.zhenya.todo.events.event.ChecklistItemStatusUpdatedEvent;
 import ua.zhenya.todo.mappers.ChecklistItemMapper;
 import ua.zhenya.todo.model.ChecklistItem;
 import ua.zhenya.todo.model.Task;
-import ua.zhenya.todo.model.User;
-import ua.zhenya.todo.project.ProjectPermission;
 import ua.zhenya.todo.repository.ChecklistItemRepository;
 import ua.zhenya.todo.utils.TaskUtils;
 
@@ -52,13 +50,22 @@ public class ChecklistItemService {
     }
 
     @Transactional
-
     public ChecklistItem update(Integer taskId, Integer checklistItemId, ChecklistItemCreateRequest checklistItemCreateRequest) {
         Task task = taskService.findById(taskId);
         ChecklistItem checklistItem = findById(checklistItemId);
         checkTaskContainsChecklistItem(task, checklistItem);
-
         checklistItemMapper.toEntity(checklistItemCreateRequest, checklistItem);
+
+        if (checklistItemCreateRequest.getTargetDate() == null && checklistItemCreateRequest.getTargetTime() == null) {
+            task.setTargetDate(null);
+            task.setTargetTime(null);
+        } else {
+            if (checklistItemCreateRequest.getTargetDate() == null) {
+                throw new IllegalArgumentException("Укажите сначала дату!");
+            }
+            checklistItem.setTargetDate(checklistItemCreateRequest.getTargetDate());
+            checklistItem.setTargetTime(checklistItemCreateRequest.getTargetTime());
+        }
 
 
         return checklistItemRepository.save(checklistItem);
@@ -80,7 +87,6 @@ public class ChecklistItemService {
     }
 
     @Transactional
-
     public void delete(Integer taskId, Integer checklistItemId) {
         Task task = taskService.findById(taskId);
 

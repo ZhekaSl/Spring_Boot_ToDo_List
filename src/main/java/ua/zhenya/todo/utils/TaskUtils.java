@@ -19,30 +19,4 @@ public class TaskUtils {
             throw new IllegalArgumentException("Укажите сначала дату!");
         }
     }
-
-    public static void verifyTaskOwner(Task task, User user) {
-        if (!task.getUser().getId().equals(user.getId())) {
-            throw new AccessDeniedException("Вы не можете этого сделать!");
-        }
-    }
-
-    public static void verifyProjectOwner(BaseProject project, User user) {
-        if (!project.getOwner().equals(user)) {
-            throw new AccessDeniedException("Вы не можете этого сделать!");
-        }
-    }
-
-    public static void verifyProjectMember(Project project, User user) {
-        boolean isMember = project.getUserProjects().stream()
-                .anyMatch(userProject -> Objects.equals(userProject.getUser(), user));
-        if (!isMember) {
-            throw new AccessDeniedException("Вы не можете этого сделать!");
-        }
-    }
-
-    public static void verifyProjectAccess(Project project, User user) {
-        if (!project.getOwner().equals(user)) {
-            verifyProjectMember(project, user);
-        }
-    }
 }

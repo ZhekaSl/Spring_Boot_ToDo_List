@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ua.zhenya.todo.dto.PageResponse;
@@ -29,15 +30,17 @@ public class UserInvitationController {
         return ResponseEntity.ok(PageResponse.of(page));
     }
 
+    @PreAuthorize("@customSecurityExpression.canChangeInvitationStatus(#invitationId)")
     @PostMapping("/{invitationId}/accept")
     public ResponseEntity<Void> acceptInvitation(@AuthenticationPrincipal JwtUserDetails jwtUserDetails, @PathVariable Integer invitationId) {
-        invitationService.accept(jwtUserDetails.getId(), invitationId);
+        invitationService.accept(invitationId);
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("@customSecurityExpression.canChangeInvitationStatus(#invitationId)")
     @PostMapping("/{invitationId}/reject")
     public ResponseEntity<Void> rejectInvitation(@AuthenticationPrincipal JwtUserDetails jwtUserDetails, @PathVariable Integer invitationId) {
-        invitationService.reject(jwtUserDetails.getId(), invitationId);
+        invitationService.reject(invitationId);
         return ResponseEntity.ok().build();
     }
 }

@@ -53,7 +53,8 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.CREATED).body(taskResponse);
     }
 
-    @PreAuthorize("@customSecurityExpression.canModifyTask(#id)")
+    @PreAuthorize("@customSecurityExpression.canModifyTask(#id)" +
+                  " && @customSecurityExpression.canModifyProject(#taskUpdateRequest.projectId)")
     @PutMapping("/{id}")
     public ResponseEntity<TaskResponse> update(@PathVariable Integer id,
                                                @Valid @RequestBody TaskCreateRequest taskUpdateRequest) {
