@@ -20,7 +20,6 @@ import java.util.Objects;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ProjectService {
-    //    private final BaseProjectRepository<Project> baseProjectRepository;
     private final ProjectRepository projectRepository;
     private final UserService userService;
     private final ProjectMapper projectMapper;

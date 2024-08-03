@@ -8,11 +8,8 @@ import ua.zhenya.todo.project.Project;
 
 @Mapper(componentModel = "spring")
 public interface ProjectMapper {
-
-
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void update(ProjectRequest projectRequest, @MappingTarget Project project);
-
 
     Project toEntity(ProjectRequest projectRequest);
 

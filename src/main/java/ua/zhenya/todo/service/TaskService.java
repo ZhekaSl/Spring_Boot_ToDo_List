@@ -3,6 +3,7 @@ package ua.zhenya.todo.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -46,10 +47,10 @@ public class TaskService {
     }
 
     @Transactional
-    @CachePut(value = "tasks", key = "#result.id")
     public Task create(Integer userId, TaskCreateRequest taskCreateRequest) {
         User user = userService.findById(userId);
         BaseProject baseProject = baseProjectService.findById(taskCreateRequest.getProjectId());
+        Hibernate.initialize(user.getTasks());
 
         TaskUtils.checkDateIfTimeIsPresent(taskCreateRequest.getTargetDate(), taskCreateRequest.getTargetTime());
         Task task = taskMapper.toEntity(taskCreateRequest);
