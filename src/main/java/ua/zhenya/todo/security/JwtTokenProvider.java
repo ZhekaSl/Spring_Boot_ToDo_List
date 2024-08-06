@@ -1,7 +1,6 @@
 package ua.zhenya.todo.security;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.impl.DefaultClaims;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +13,11 @@ import org.springframework.stereotype.Service;
 import ua.zhenya.todo.model.Role;
 import ua.zhenya.todo.model.User;
 import ua.zhenya.todo.service.UserService;
+import ua.zhenya.todo.service.properties.JwtProperties;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;

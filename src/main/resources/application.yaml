@@ -15,6 +15,20 @@ spring:
       format_sql: true
       hbm2ddl.auto: validate
     open-in-view: false
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: zhenya.slepko@gmail.com
+    password: mxcmisxavwbppuqv
+    properties:
+      mail:
+        debug: true
+        transport:
+          protocol: smtp
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   graphql:
     graphiql:
       enabled: true
