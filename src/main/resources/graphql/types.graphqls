@@ -1,0 +1,3 @@
+scalar LocalDateTime
+scalar LocalDate
+scalar LocalTime

@@ -35,7 +35,7 @@ public abstract class BaseProject implements Serializable {
     private List<Task> tasks = new ArrayList<>();
 
     protected abstract void generateId();
-
+    
     public abstract User getOwner();
 
     public void addTask(Task task) {

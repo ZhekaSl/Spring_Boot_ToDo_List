@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,10 +22,9 @@ import ua.zhenya.todo.service.TaskService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/tasks")
-public class TaskController {
+public class TaskController  {
     private final TaskService taskService;
     private final TaskMapper taskMapper;
-
 
     @GetMapping
     public PageResponse<TaskResponse> findAll(@AuthenticationPrincipal JwtUserDetails jwtUserDetails,
@@ -33,7 +34,6 @@ public class TaskController {
                 .map(taskMapper::toResponse);
         return PageResponse.of(page);
     }
-
 
     @PreAuthorize("@customSecurityExpression.canAccessTask(#id)")
     @GetMapping("/{id}")

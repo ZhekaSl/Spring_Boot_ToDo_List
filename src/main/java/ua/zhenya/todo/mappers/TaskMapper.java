@@ -1,6 +1,7 @@
 package ua.zhenya.todo.mappers;
 
 import org.mapstruct.*;
+import org.springframework.stereotype.Component;
 import ua.zhenya.todo.dto.task.TaskCreateRequest;
 import ua.zhenya.todo.dto.task.TaskResponse;
 import ua.zhenya.todo.model.Task;

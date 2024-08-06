@@ -1,0 +1,25 @@
+interface BaseProject {
+    id: ID
+    name: String
+    color: String
+}
+
+type Inbox implements BaseProject {
+    id: ID
+    name: String
+    color: String
+}
+
+type Project implements BaseProject {
+    id: ID
+    name: String
+    color: String
+    inviteUrlEnabled: Boolean
+    approvalRequired: Boolean
+    defaultPermission: ProjectPermission
+}
+
+enum ProjectPermission {
+    READ,
+    WRITE
+}

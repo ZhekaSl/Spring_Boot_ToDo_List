@@ -1,0 +1,13 @@
+type ChecklistItem {
+    id : ID
+    title : String
+    completed : Boolean
+    targetDate : LocalDate
+    targetTime :LocalTime
+}
+
+input InputChecklistItem {
+    title : String
+    targetDate : String
+    targetTime : String
+}

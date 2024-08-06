@@ -14,5 +14,4 @@ public class ProjectResponse {
     boolean approvalRequired;
     ProjectPermission defaultPermission;
 
-
 }

@@ -15,6 +15,9 @@ spring:
       format_sql: true
       hbm2ddl.auto: validate
     open-in-view: false
+  graphql:
+    graphiql:
+      enabled: true
 logging:
   level:
     org.springframework.security: trace
@@ -24,12 +27,11 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
-jwt:
-  secret: Xvr8ADeKuDBRKAbc0DQMHqx5cHLzLjx65qLCG8GW08YebuKQZjQfUw5JqB8b
-  lifetime: 600m
+
+
 security:
   jwt:
-    secret: fjsdkfjs;dJGFKsdjgfks;jkg&?fjsdkfj;gj"JKASDJGDSKGdjkfs=fjdskf42daj
+    secret: fjsdkfjs;dJGFKsdjgfks;jkg&?fjsdkfj;gj"JKASDJGDSKGdjkfs=fjdskf42dajjik9=8
     access: 1800000
     refresh: 2592000000
 

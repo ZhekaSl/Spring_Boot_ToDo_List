@@ -87,12 +87,35 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-<!--
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <artifactId>spring-boot-starter-graphql</artifactId>
         </dependency>
--->
+
+        <dependency>
+            <groupId>com.graphql-java-kickstart</groupId>
+            <artifactId>graphql-java-kickstart</artifactId>
+            <version>15.2.0</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphql-java-extended-scalars</artifactId>
+            <version>22.0</version>
+        </dependency>
+
+
+
+
+
+
+        <!--
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-data-redis</artifactId>
+                </dependency>
+        -->
 
 
         <dependency>
@@ -152,6 +175,12 @@
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
             <version>${jwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>23.0.0</version>
+            <scope>compile</scope>
         </dependency>
 
 

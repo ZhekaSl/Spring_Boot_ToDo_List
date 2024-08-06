@@ -1,0 +1,22 @@
+type User {
+    id : ID
+    email : String
+    firstname: String
+    birthDate: LocalDate
+}
+
+input CreateInputUser {
+    email: String
+    firstName: String
+    birthDate: LocalDate
+    password: String
+    passwordConfirmation: String
+}
+
+input UpdateInputUser {
+    email: String
+    firstName: String
+    birthDate: LocalDate
+    password: String
+    newPassword: String
+}
