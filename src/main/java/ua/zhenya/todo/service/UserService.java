@@ -49,17 +49,17 @@ public class UserService {
         return userRepository.findAll(pageable);
     }
 
-    @Cacheable(value = "users", key = "#id")
+/*    @Cacheable(value = "users", key = "#id")*/
     public User findById(Integer id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Пользователь с id: " + id + " не найден!"));
     }
 
     @Transactional
-    @Caching(put = {
+/*    @Caching(put = {
             @CachePut(value = "users", key = "#result.id"),
             @CachePut(value = "users", key = "#result.email")
-    })
+    })*/
     public User create(RegistrationUserRequest userDTO) {
         if (!userDTO.getPassword().equals(userDTO.getConfirmPassword()))
             throw new IllegalArgumentException("Пароли не совпадают!");
@@ -77,16 +77,16 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Ошибка при создании пользователя!"));
     }
 
-    @Cacheable(value = "users", key = "#email")
+/*    @Cacheable(value = "users", key = "#email")*/
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь с почтой: " + email + " не был найден!"));
     }
 
-    @Caching(put = {
+/*    @Caching(put = {
             @CachePut(value = "users", key = "#result.id"),
             @CachePut(value = "users", key = "#result.email")
-    })
+    })*/
     @Transactional
     public User update(Integer id, UserUpdateRequest userDTO) {
         return userRepository.findById(id)
@@ -103,7 +103,7 @@ public class UserService {
 
 
     @Transactional
-    @CacheEvict(value = "users", key = "#id")
+/*    @CacheEvict(value = "users", key = "#id")*/
     public boolean delete(Integer id) {
         return userRepository.findById(id)
                 .map(entity -> {

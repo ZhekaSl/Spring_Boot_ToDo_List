@@ -2,22 +2,30 @@ package ua.zhenya.todo.events.listener;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ua.zhenya.todo.events.event.UserRegisteredEvent;
+import ua.zhenya.todo.model.MailType;
 import ua.zhenya.todo.model.User;
 import ua.zhenya.todo.project.Inbox;
 import ua.zhenya.todo.service.InboxService;
+import ua.zhenya.todo.service.MailService;
+
+import java.util.Properties;
 
 @Component
 @RequiredArgsConstructor
 public class UserRegisteredListener {
     private final InboxService inboxService;
+    private final MailService mailService;
     @EventListener
     @Transactional
-    public void handleCreateInboxForNewUser(UserRegisteredEvent event) {
+    public void handleUserRegisteredEvent(UserRegisteredEvent event) {
         User user = event.getUser();
         inboxService.create(user.getEmail());
+        mailService.sendMail(user, MailType.REGISTER, new Properties());
     }
+
 
 }

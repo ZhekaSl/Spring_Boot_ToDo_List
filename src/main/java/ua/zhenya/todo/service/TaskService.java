@@ -19,7 +19,11 @@ import ua.zhenya.todo.project.BaseProject;
 import ua.zhenya.todo.repository.TaskRepository;
 import ua.zhenya.todo.utils.TaskUtils;
 
+import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -122,4 +126,13 @@ public class TaskService {
         taskRepository.delete(task);
     }
 
+    public List<Task> getAllSoonTasks(Duration duration) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime deadline = now.plus(duration);
+
+        return taskRepository.findAllSoonTasks(
+                now.toLocalDate(), deadline.toLocalDate(),
+                now.toLocalTime(), deadline.toLocalTime()
+        );
+    }
 }
