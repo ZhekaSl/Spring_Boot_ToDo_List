@@ -19,8 +19,6 @@ public class ChecklistItem {
     private Integer id;
     private String title;
     private boolean completed;
-    private LocalDate targetDate;
-    private LocalTime targetTime;
     @ManyToOne
     @JoinColumn(name = "task_id")
     private Task task;

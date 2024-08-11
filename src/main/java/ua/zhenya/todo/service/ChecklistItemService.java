@@ -41,8 +41,6 @@ public class ChecklistItemService {
     public ChecklistItem create(Integer taskId, ChecklistItemCreateRequest checklistItemCreateRequest) {
         Task task = taskService.findById(taskId);
 
-        TaskUtils.checkDateIfTimeIsPresent(checklistItemCreateRequest.getTargetDate(), checklistItemCreateRequest.getTargetTime());
-
         ChecklistItem checklistItem = checklistItemMapper.toEntity(checklistItemCreateRequest);
         task.addChecklistItem(checklistItem);
 
@@ -55,17 +53,6 @@ public class ChecklistItemService {
         ChecklistItem checklistItem = findById(checklistItemId);
         checkTaskContainsChecklistItem(task, checklistItem);
         checklistItemMapper.toEntity(checklistItemCreateRequest, checklistItem);
-
-        if (checklistItemCreateRequest.getTargetDate() == null && checklistItemCreateRequest.getTargetTime() == null) {
-            task.setTargetDate(null);
-            task.setTargetTime(null);
-        } else {
-            if (checklistItemCreateRequest.getTargetDate() == null) {
-                throw new IllegalArgumentException("Укажите сначала дату!");
-            }
-            checklistItem.setTargetDate(checklistItemCreateRequest.getTargetDate());
-            checklistItem.setTargetTime(checklistItemCreateRequest.getTargetTime());
-        }
 
         return checklistItemRepository.save(checklistItem);
     }
