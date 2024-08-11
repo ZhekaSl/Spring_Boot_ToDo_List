@@ -12,17 +12,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.zhenya.todo.dto.task.TaskCreateRequest;
+import ua.zhenya.todo.dto.task.TaskDueDetailsDTO;
 import ua.zhenya.todo.mappers.TaskMapper;
 import ua.zhenya.todo.model.Task;
+import ua.zhenya.todo.model.TaskDueInfo;
 import ua.zhenya.todo.model.User;
 import ua.zhenya.todo.project.BaseProject;
 import ua.zhenya.todo.repository.TaskRepository;
-import ua.zhenya.todo.utils.TaskUtils;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.List;
 
 @Service
@@ -56,7 +54,6 @@ public class TaskService {
         BaseProject baseProject = baseProjectService.findById(taskCreateRequest.getProjectId());
         Hibernate.initialize(user.getTasks());
 
-        TaskUtils.checkDateIfTimeIsPresent(taskCreateRequest.getTargetDate(), taskCreateRequest.getTargetTime());
         Task task = taskMapper.toEntity(taskCreateRequest);
         baseProject.addTask(task);
         user.addTask(task);

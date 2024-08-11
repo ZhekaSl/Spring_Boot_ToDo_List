@@ -4,9 +4,7 @@ import lombok.Value;
 import ua.zhenya.todo.dto.checklist.ChecklistItemResponse;
 import ua.zhenya.todo.model.Priority;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Value
@@ -14,10 +12,9 @@ public class TaskResponse {
     Integer id;
     String name;
     String description;
-    LocalDate targetDate;
-    LocalTime targetTime;
+    TaskDueDetailsDTO taskDueDetailsDTO;
     boolean completed;
-    LocalDateTime completedDateTime;
+    ZonedDateTime completedDateTime;
     Priority priority;
     Integer parentId;
     String projectId;

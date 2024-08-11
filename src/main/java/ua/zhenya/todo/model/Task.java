@@ -25,8 +25,8 @@ public class Task implements BaseEntity<Integer>, Serializable {
     private Integer id;
     private String name;
     private String description;
-    private LocalDate targetDate;
-    private LocalTime targetTime;
+    @Embedded
+    private TaskDueInfo taskDueInfo;
     private boolean completed;
     @Column(name = "completed_timestamp")
     private LocalDateTime completedDateTime;

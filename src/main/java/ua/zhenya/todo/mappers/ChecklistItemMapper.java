@@ -16,9 +16,11 @@ public interface ChecklistItemMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "completed", ignore = true)
     ChecklistItem toEntity(ChecklistItemCreateRequest checklistItemCreateRequest);
+
     void toEntity(ChecklistItemCreateRequest request, @MappingTarget ChecklistItem checklistItem);
 
     ChecklistItemResponse toResponse(ChecklistItem checklistItem);
 
     List<ChecklistItemResponse> toResponseList(List<ChecklistItem> checklistItems);
+
 }

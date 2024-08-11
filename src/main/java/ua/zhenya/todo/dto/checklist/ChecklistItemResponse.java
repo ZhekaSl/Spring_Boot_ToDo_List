@@ -10,6 +10,5 @@ public class ChecklistItemResponse {
     Integer id;
     String title;
     boolean completed;
-    LocalDate targetDate;
-    LocalTime targetTime;
+    ChecklistDueDetails checklistDueDetails;
 }
