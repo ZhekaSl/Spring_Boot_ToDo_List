@@ -96,16 +96,6 @@ public class TaskService {
             newProject.addTask(task);
         }
 
-        if (taskUpdateRequest.getTargetDate() == null && taskUpdateRequest.getTargetTime() == null) {
-            task.setTargetDate(null);
-            task.setTargetTime(null);
-        } else {
-            if (taskUpdateRequest.getTargetDate() == null) {
-                throw new IllegalArgumentException("Укажите сначала дату!");
-            }
-            task.setTargetDate(taskUpdateRequest.getTargetDate());
-            task.setTargetTime(taskUpdateRequest.getTargetTime());
-        }
         return taskRepository.save(task);
     }
 
