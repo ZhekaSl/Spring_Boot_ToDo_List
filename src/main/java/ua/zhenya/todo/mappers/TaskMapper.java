@@ -1,13 +1,13 @@
 package ua.zhenya.todo.mappers;
 
 import org.mapstruct.*;
-import org.springframework.stereotype.Component;
 import ua.zhenya.todo.dto.task.TaskCreateRequest;
 import ua.zhenya.todo.dto.task.TaskDueDetailsDTO;
 import ua.zhenya.todo.dto.task.TaskResponse;
 import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.model.TaskDueInfo;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -19,12 +19,11 @@ public interface TaskMapper {
     @Mapping(target = "parentId", expression = "java(task.getParentTask() != null ? task.getParentTask().getId() : null)")
     TaskResponse toResponse(Task task);
 
-    @Mapping(target = "taskDueInfo", source = "taskDueDetailsDTO", qualifiedByName = "mapDueDetails")
+    @Mapping(target = "taskDueInfo", source = "due", qualifiedByName = "mapDueDetails")
     Task toEntity(TaskCreateRequest taskCreateRequest);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "targetDate", ignore = true)
-    @Mapping(target = "targetTime", ignore = true)
+    @Mapping(target = "taskDueInfo", source = "due", qualifiedByName = "mapDueDetails")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
     void update(TaskCreateRequest taskCreateRequest, @MappingTarget Task task);
 
     List<TaskResponse> toResponseList(List<Task> tasks);
@@ -35,22 +34,18 @@ public interface TaskMapper {
             return null;
         }
 
-        ZonedDateTime dueDateTime = dto.getDueDateTime();
+        LocalDateTime dueDateTime = dto.getDueDateTime();
         if (dueDateTime == null) {
             return null;
         }
 
-        boolean timeIncluded = dto.isTimeIncluded();
-        ZoneId timeZone = dto.getTimeZone() != null ? dto.getTimeZone() : ZoneId.systemDefault();
-
-        if (!timeIncluded) {
-            dueDateTime = dueDateTime.toLocalDate().atStartOfDay(timeZone);
-        }
+        ZoneId timeZone = dto.getTimeZone() != null ?
+                ZoneId.of(dto.getTimeZone()) : ZoneId.of(ZoneId.systemDefault().getId());
+        ZonedDateTime zonedDateTime = ZonedDateTime.of(dueDateTime, timeZone);
 
         return TaskDueInfo.builder()
-                .dueDateTime(dueDateTime)
-                .timeIncluded(timeIncluded)
-                .timeZone(timeZone)
+                .dueDateTime(zonedDateTime)
+                .timeZone(timeZone.getId())
                 .build();
     }
 

@@ -7,7 +7,7 @@ import ua.zhenya.todo.model.Priority;
 public class TaskCreateRequest {
     String name;
     String description;
-    TaskDueDetailsDTO taskDueDetailsDTO;
+    TaskDueDetailsDTO due;
     Priority priority;
     String projectId;
 }

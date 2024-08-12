@@ -12,7 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.zhenya.todo.dto.task.TaskCreateRequest;
-import ua.zhenya.todo.dto.task.TaskDueDetailsDTO;
 import ua.zhenya.todo.mappers.TaskMapper;
 import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.model.TaskDueInfo;
@@ -55,6 +54,15 @@ public class TaskService {
         Hibernate.initialize(user.getTasks());
 
         Task task = taskMapper.toEntity(taskCreateRequest);
+
+        TaskDueInfo taskDueInfo = task.getTaskDueInfo();
+        if (taskDueInfo != null) {
+            ZonedDateTime dueDateTime = taskDueInfo.getDueDateTime();
+            if (dueDateTime != null) {
+                taskDueInfo.setDueDateTime(convertZonedDateToUTC(dueDateTime));
+            }
+        }
+
         baseProject.addTask(task);
         user.addTask(task);
         return taskRepository.save(task);
@@ -68,7 +76,10 @@ public class TaskService {
         task.setCompleted(!task.isCompleted());
 
         if (task.isCompleted()) {
-            task.setCompletedDateTime(LocalDateTime.now());
+            ZoneId zoneId = task.getTaskDueInfo().getTimeZone() != null
+                    ? ZoneId.of(task.getTaskDueInfo().getTimeZone())
+                    : ZoneId.systemDefault();
+            task.setCompletedDateTime(ZonedDateTime.now(zoneId));
         } else {
             task.setCompletedDateTime(null);
         }
@@ -96,6 +107,14 @@ public class TaskService {
             newProject.addTask(task);
         }
 
+        TaskDueInfo taskDueInfo = task.getTaskDueInfo();
+        if (taskDueInfo != null) {
+            ZonedDateTime dueDateTime = taskDueInfo.getDueDateTime();
+            if (dueDateTime != null) {
+                taskDueInfo.setDueDateTime(convertZonedDateToUTC(dueDateTime));
+            }
+        }
+
         return taskRepository.save(task);
     }
 
@@ -113,13 +132,14 @@ public class TaskService {
         taskRepository.delete(task);
     }
 
-    public List<Task> getAllSoonTasks(Duration duration) {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime deadline = now.plus(duration);
+    public List<Task> findAllSoonTasks(Duration duration) {
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        ZonedDateTime deadline = now.plus(duration);
 
-        return taskRepository.findAllSoonTasks(
-                now.toLocalDate(), deadline.toLocalDate(),
-                now.toLocalTime(), deadline.toLocalTime()
-        );
+        return taskRepository.findAllSoonTasks(now, deadline);
+    }
+
+    private ZonedDateTime convertZonedDateToUTC(ZonedDateTime zonedDateTime) {
+        return zonedDateTime.withZoneSameInstant(ZoneOffset.UTC);
     }
 }

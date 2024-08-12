@@ -11,6 +11,7 @@ import ua.zhenya.todo.model.Task;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,13 +24,10 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
     @EntityGraph(attributePaths = {"subtasks", "checklistItems"})
     Optional<Task> findById(Integer id);
 
-    @Query("SELECT t FROM Task t JOIN FETCH t.user WHERE t.completed = false AND " +
-           "(t.targetDate > :startDate OR (t.targetDate = :startDate AND t.targetTime >= :startTime)) AND " +
-           "(t.targetDate < :endDate OR (t.targetDate = :endDate AND t.targetTime <= :endTime))")
+    @Query("SELECT t from Task t JOIN FETCH t.user WHERE t.completed = false AND " +
+           "t.taskDueInfo.dueDateTime BETWEEN :start AND :end")
     List<Task> findAllSoonTasks(
-            @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate,
-            @Param("startTime") LocalTime startTime,
-            @Param("endTime") LocalTime endTime
+            @Param("start") ZonedDateTime startDate,
+            @Param("end") ZonedDateTime endDate
     );
 }

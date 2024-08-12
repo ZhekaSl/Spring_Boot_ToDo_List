@@ -2,12 +2,10 @@ package ua.zhenya.todo.dto.task;
 
 import lombok.Value;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 @Value
 public class TaskDueDetailsDTO {
-    ZonedDateTime dueDateTime;
-    boolean timeIncluded;
-    ZoneId timeZone;
+    LocalDateTime dueDateTime;
+    String timeZone;
 }

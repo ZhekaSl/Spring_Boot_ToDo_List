@@ -10,5 +10,4 @@ public class ChecklistItemResponse {
     Integer id;
     String title;
     boolean completed;
-    ChecklistDueDetails checklistDueDetails;
 }

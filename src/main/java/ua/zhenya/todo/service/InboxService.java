@@ -30,14 +30,14 @@ public class InboxService {
         inboxRepository.save(inbox);
     }
 
-    public String get(String username) {
-        User user = userService.findByEmail(username);
+    public String get(Integer id) {
+        User user = userService.findById(id);
         return user.getInbox().getId();
     }
 
     @Transactional
-    public String update(String username, String color) {
-        User user = userService.findByEmail(username);
+    public String update(Integer id, String color) {
+        User user = userService.findById(id);
         Inbox inbox = user.getInbox();
         inbox.setColor(color);
         saveInbox(inbox);

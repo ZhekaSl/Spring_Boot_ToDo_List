@@ -12,7 +12,7 @@ public class TaskResponse {
     Integer id;
     String name;
     String description;
-    TaskDueDetailsDTO taskDueDetailsDTO;
+    TaskDueDetailsDTO due;
     boolean completed;
     ZonedDateTime completedDateTime;
     Priority priority;

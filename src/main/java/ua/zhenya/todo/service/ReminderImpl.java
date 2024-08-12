@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import ua.zhenya.todo.model.MailType;
 import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.model.User;
-import ua.zhenya.todo.repository.TaskRepository;
 
 import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Properties;
 
@@ -19,16 +19,27 @@ public class ReminderImpl implements Reminder {
     private final MailService mailService;
     private final Duration duration = Duration.ofHours(1);
 
-/*    @Scheduled(cron = " 0 * * * * *")*/
+    @Scheduled(cron = "0 * * * * *")
     @Override
     public void remind() {
-        List<Task> tasks = taskService.getAllSoonTasks(duration);
+        List<Task> tasks = taskService.findAllSoonTasks(duration);
         tasks.forEach(task -> {
-            User user = task.getUser();
-            Properties properties = new Properties();
-            properties.setProperty("task.title", task.getName());
-            properties.setProperty("task.description", task.getDescription());
-            mailService.sendMail(user, MailType.REMINDER, properties);
+            ZonedDateTime taskDueDateTime = task.getTaskDueInfo().getDueDateTime();
+            ZonedDateTime nowUserTime = ZonedDateTime.now(taskDueDateTime.getZone());
+            ZonedDateTime oneHourBeforeDue = taskDueDateTime.minusHours(1);
+
+            System.out.println(taskDueDateTime);
+            System.out.println(nowUserTime);
+            System.out.println(oneHourBeforeDue);
+
+            if (nowUserTime.isAfter(oneHourBeforeDue) && nowUserTime.isBefore(taskDueDateTime)) {
+                User user = task.getUser();
+                Properties properties = new Properties();
+                properties.setProperty("task.title", task.getName());
+                properties.setProperty("task.description", task.getDescription());
+                mailService.sendMail(user, MailType.REMINDER, properties);
+            }
         });
     }
 }
+

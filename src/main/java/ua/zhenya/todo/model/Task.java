@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class Task implements BaseEntity<Integer>, Serializable {
     private TaskDueInfo taskDueInfo;
     private boolean completed;
     @Column(name = "completed_timestamp")
-    private LocalDateTime completedDateTime;
+    private ZonedDateTime completedDateTime;
     @Enumerated(EnumType.STRING)
     private Priority priority;
 

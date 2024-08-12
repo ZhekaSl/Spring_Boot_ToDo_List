@@ -1,5 +1,6 @@
 package ua.zhenya.todo.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.*;
 
@@ -12,7 +13,8 @@ import java.time.ZonedDateTime;
 @Builder
 @Embeddable
 public class TaskDueInfo {
+    @Column(name = "due_timestamp")
     private ZonedDateTime dueDateTime;
-    private boolean timeIncluded;
-    private ZoneId timeZone;
+    @Column(name = "time_zone")
+    private String timeZone;
 }
