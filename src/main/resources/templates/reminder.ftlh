@@ -1,3 +1,8 @@
+<#-- Настройки форматирования -->
+<#setting date_format="yyyy-MM-dd">
+<#setting time_format="HH:mm:ss">
+<#setting locale="en_US">
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -46,16 +51,20 @@
     <div id="div">
         <h1 style="text-align: center">Reminder</h1>
         <p>Hello, ${firstname}!</p>
-        <p>This is friendly reminder that you have a task to do in 1 hour.</p>
+        <p>This is a friendly reminder that you have tasks to do in 1 hour.</p>
         <div>
-            <hr>
-            <p>Title: ${title}</p>
-            <#if description??>
-                <p>Description: ${description}</p>
-            </#if>
-            <hr>
+            <#list tasks as task>
+                <hr>
+                <p>Title: ${task.name}</p>
+                <#if task.description??>
+                    <p>Description: ${task.description}</p>
+                </#if>
+                <p>Due Date: ${task.taskDueInfo.dueDateTime?datetime("yyyy-MM-dd'T'HH:mm'Z'")?date}</p>
+                <p>Due Time: ${task.taskDueInfo.dueDateTime?datetime("yyyy-MM-dd'T'HH:mm'Z'")?time}</p>
+                <hr>
+            </#list>
         </div>
-        <p>You can get more information about this task in the app.</p>
+        <p>You can get more information about these tasks in the app.</p>
     </div>
 </div>
 </body>

@@ -8,7 +8,6 @@ import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.model.User;
 
 import java.time.*;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -30,14 +29,8 @@ public class ReminderImpl implements Reminder {
 
         tasksByUser.forEach((user, userTasks) -> {
             Properties properties = new Properties();
-            StringBuilder taskList = new StringBuilder();
-            for (Task task : userTasks) {
-                taskList.append("Задача: ").append(task.getName()).append("\n")
-                        .append("Описание: ").append(task.getDescription()).append("\n")
-                        .append("Дедлайн: ").append(task.getTaskDueInfo().getDueDateTime()).append("\n\n");
-            }
-            properties.setProperty("tasks", taskList.toString());
 
+            properties.put("tasks", userTasks);
             mailService.sendMail(user, MailType.REMINDER, properties);
         });
     }

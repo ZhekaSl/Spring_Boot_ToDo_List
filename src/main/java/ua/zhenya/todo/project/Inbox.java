@@ -8,6 +8,7 @@ import ua.zhenya.todo.model.User;
 import java.util.ArrayList;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true, exclude = "owner")
 @Entity
 @Table(name = "inboxes")
 @Data

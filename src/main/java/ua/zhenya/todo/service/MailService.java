@@ -5,7 +5,6 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMailMessage;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -69,8 +68,7 @@ public class MailService {
         StringWriter stringWriter = new StringWriter();
         Map<String, Object> model = new HashMap<>();
         model.put("firstname", user.getFirstname());
-        model.put("title", properties.getProperty("task.title"));
-        model.put("description", properties.getProperty("task.description"));
+        model.put("tasks", properties.get("tasks"));
         configuration.getTemplate("reminder.ftlh")
                 .process(model, stringWriter);
 

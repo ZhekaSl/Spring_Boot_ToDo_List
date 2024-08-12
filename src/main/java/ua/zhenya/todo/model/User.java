@@ -12,6 +12,7 @@ import java.util.*;
 
 @Entity
 @Data
+@EqualsAndHashCode(exclude = "inbox")
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
