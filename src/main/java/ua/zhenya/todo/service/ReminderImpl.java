@@ -7,10 +7,12 @@ import ua.zhenya.todo.model.MailType;
 import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.model.User;
 
-import java.time.Duration;
-import java.time.ZonedDateTime;
+import java.time.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,23 +25,20 @@ public class ReminderImpl implements Reminder {
     @Override
     public void remind() {
         List<Task> tasks = taskService.findAllSoonTasks(duration);
-        tasks.forEach(task -> {
-            ZonedDateTime taskDueDateTime = task.getTaskDueInfo().getDueDateTime();
-            ZonedDateTime nowUserTime = ZonedDateTime.now(taskDueDateTime.getZone());
-            ZonedDateTime oneHourBeforeDue = taskDueDateTime.minusHours(1);
+        Map<User, List<Task>> tasksByUser = tasks.stream()
+                .collect(Collectors.groupingBy(Task::getUser));
 
-            System.out.println(taskDueDateTime);
-            System.out.println(nowUserTime);
-            System.out.println(oneHourBeforeDue);
-
-            if (nowUserTime.isAfter(oneHourBeforeDue) && nowUserTime.isBefore(taskDueDateTime)) {
-                User user = task.getUser();
-                Properties properties = new Properties();
-                properties.setProperty("task.title", task.getName());
-                properties.setProperty("task.description", task.getDescription());
-                mailService.sendMail(user, MailType.REMINDER, properties);
+        tasksByUser.forEach((user, userTasks) -> {
+            Properties properties = new Properties();
+            StringBuilder taskList = new StringBuilder();
+            for (Task task : userTasks) {
+                taskList.append("Задача: ").append(task.getName()).append("\n")
+                        .append("Описание: ").append(task.getDescription()).append("\n")
+                        .append("Дедлайн: ").append(task.getTaskDueInfo().getDueDateTime()).append("\n\n");
             }
+            properties.setProperty("tasks", taskList.toString());
+
+            mailService.sendMail(user, MailType.REMINDER, properties);
         });
     }
 }
-

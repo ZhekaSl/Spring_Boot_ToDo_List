@@ -48,6 +48,4 @@ public interface TaskMapper {
                 .timeZone(timeZone.getId())
                 .build();
     }
-
-
 }
