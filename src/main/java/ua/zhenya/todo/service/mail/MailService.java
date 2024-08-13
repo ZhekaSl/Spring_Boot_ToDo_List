@@ -1,6 +1,5 @@
-package ua.zhenya.todo.service;
+package ua.zhenya.todo.service.mail;
 
-import freemarker.template.Configuration;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -11,26 +10,33 @@ import org.springframework.stereotype.Service;
 import ua.zhenya.todo.model.MailType;
 import ua.zhenya.todo.model.User;
 
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 @Service
 @RequiredArgsConstructor
 public class MailService {
-    private final Configuration configuration;
     private final JavaMailSender mailSender;
+    private final MailStrategyFactory mailStrategyFactory;
 
     @Async
-    public void sendMail(User user, MailType mailType, Properties properties) {
-        switch (mailType) {
-            case REGISTER -> sendRegistrationEmail(user, properties);
-            case REMINDER -> sendReminderEmail(user, properties);
-        }
+    public void sendMail(String email, MailType mailType, Properties properties) {
+        MailStrategy strategy = mailStrategyFactory.getMailStrategy(mailType);
+        String subject = strategy.setSubject(properties);
+        String content = strategy.setContent(properties);
+        sendEmail(email, subject, content);
     }
 
     @SneakyThrows
+    private void sendEmail(String email, String subject, String content) {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
+        helper.setSubject(subject);
+        helper.setTo(email);
+        helper.setText(content, true);
+        mailSender.send(mimeMessage);
+    }
+
+/*    @SneakyThrows
     private void sendRegistrationEmail(User user, Properties properties) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
@@ -73,5 +79,5 @@ public class MailService {
                 .process(model, stringWriter);
 
         return stringWriter.getBuffer().toString();
-    }
+    }*/
 }

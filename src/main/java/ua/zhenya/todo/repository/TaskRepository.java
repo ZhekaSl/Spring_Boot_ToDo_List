@@ -24,8 +24,8 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
     @EntityGraph(attributePaths = {"subtasks", "checklistItems"})
     Optional<Task> findById(Integer id);
 
-    @Query("SELECT t from Task t JOIN FETCH t.user WHERE t.completed = false AND " +
-           "t.taskDueInfo.dueDateTime BETWEEN :start AND :end")
+    @Query("SELECT t FROM Task t JOIN FETCH t.user WHERE t.completed = false AND " +
+           "(t.taskDueInfo.dueDateTime BETWEEN :start AND :end OR t.taskDueInfo.dueDateTime = :end)")
     List<Task> findAllSoonTasks(
             @Param("start") ZonedDateTime startDate,
             @Param("end") ZonedDateTime endDate
