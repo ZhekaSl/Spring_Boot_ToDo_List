@@ -1,6 +1,8 @@
 <#-- Настройки форматирования -->
 <#setting date_format="yyyy-MM-dd">
 <#setting time_format="HH:mm:ss">
+<#setting time_zone="Europe/Paris">
+<#setting datetime_format="yyyy-MM-dd HH:mm:ss">
 <#setting locale="en_US">
 
 <!doctype html>
@@ -59,8 +61,7 @@
                 <#if task.description??>
                     <p>Description: ${task.description}</p>
                 </#if>
-                <p>Due Date: ${task.taskDueInfo.dueDateTime?datetime("yyyy-MM-dd'T'HH:mm'Z'")?date}</p>
-                <p>Due Time: ${task.taskDueInfo.dueDateTime?datetime("yyyy-MM-dd'T'HH:mm'Z'")?time}</p>
+                <p>Due: ${task.taskDueInfo.dueDateTime.format('yyyy-MM-dd HH:mm', task.taskDueInfo.timeZone)}</p>
                 <hr>
             </#list>
         </div>
