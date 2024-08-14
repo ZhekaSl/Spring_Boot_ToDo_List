@@ -12,6 +12,7 @@ import ua.zhenya.todo.service.TaskService;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -28,7 +29,7 @@ public class AtDueTimeReminder implements Reminder{
     @Override
     public void remind() {
         log.info("Reminder job triggered at {}", LocalDateTime.now());
-        List<Task> dueTasks = taskService.findAllSoonTasks(Duration.ZERO);
+        List<Task> dueTasks = taskService.findAllSoonTasks(Duration.of(1, ChronoUnit.MINUTES));
 
         Map<User, List<Task>> tasksByUser = dueTasks.stream()
                 .collect(Collectors.groupingBy(Task::getUser));
