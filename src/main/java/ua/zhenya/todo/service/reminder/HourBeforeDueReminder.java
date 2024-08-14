@@ -22,7 +22,7 @@ public class HourBeforeDueReminder implements Reminder {
     private final MailService mailService;
     private final Duration duration = Duration.ofHours(1);
 
-    @Scheduled(cron = "0 * * * * *")
+    /*@Scheduled(cron = "0 * * * * *")*/
     @Override
     public void remind() {
         List<Task> tasks = taskService.findAllSoonTasks(duration);
