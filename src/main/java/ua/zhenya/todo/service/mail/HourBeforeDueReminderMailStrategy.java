@@ -3,6 +3,7 @@ package ua.zhenya.todo.service.mail;
 import freemarker.template.Configuration;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 import ua.zhenya.todo.model.MailType;
 import ua.zhenya.todo.model.User;

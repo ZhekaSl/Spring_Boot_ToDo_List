@@ -35,49 +35,4 @@ public class MailService {
         helper.setText(content, true);
         mailSender.send(mimeMessage);
     }
-
-/*    @SneakyThrows
-    private void sendRegistrationEmail(User user, Properties properties) {
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
-        helper.setSubject("Thank you for registration, " + user.getFirstname() + "!");
-        helper.setTo(user.getEmail());
-        String emailContent = getRegisterEmailContent(user, properties);
-        helper.setText(emailContent, true);
-        mailSender.send(mimeMessage);
-    }
-
-    @SneakyThrows
-    private void sendReminderEmail(User user, Properties properties) {
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
-        helper.setSubject("You have tasks to do in 1 hour!");
-        helper.setTo(user.getEmail());
-        String emailContent = getReminderEmailContent(user, properties);
-        helper.setText(emailContent, true);
-        mailSender.send(mimeMessage);
-    }
-
-    @SneakyThrows
-    private String getRegisterEmailContent(User user, Properties properties) {
-        StringWriter stringWriter = new StringWriter();
-        Map<String, Object> model = new HashMap<>();
-        model.put("firstname", user.getFirstname());
-        configuration.getTemplate("register.ftlh")
-                .process(model, stringWriter);
-
-        return stringWriter.getBuffer().toString();
-    }
-
-    @SneakyThrows
-    private String getReminderEmailContent(User user, Properties properties) {
-        StringWriter stringWriter = new StringWriter();
-        Map<String, Object> model = new HashMap<>();
-        model.put("firstname", user.getFirstname());
-        model.put("tasks", properties.get("tasks"));
-        configuration.getTemplate("reminder.ftlh")
-                .process(model, stringWriter);
-
-        return stringWriter.getBuffer().toString();
-    }*/
 }
