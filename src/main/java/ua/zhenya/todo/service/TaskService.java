@@ -55,14 +55,7 @@ public class TaskService {
 
         Task task = taskMapper.toEntity(taskCreateRequest);
 
-        TaskDueInfo taskDueInfo = task.getTaskDueInfo();
-        if (taskDueInfo != null) {
-            ZonedDateTime dueDateTime = taskDueInfo.getDueDateTime();
-            if (dueDateTime != null) {
-                taskDueInfo.setDueDateTime(convertZonedDateToUTC(dueDateTime));
-            }
-        }
-
+        processTaskDueInfo(task);
         baseProject.addTask(task);
         user.addTask(task);
         return taskRepository.save(task);
@@ -108,13 +101,7 @@ public class TaskService {
             updateSubtasksProject(task, newProject);
         }
 
-        TaskDueInfo taskDueInfo = task.getTaskDueInfo();
-        if (taskDueInfo != null) {
-            ZonedDateTime dueDateTime = taskDueInfo.getDueDateTime();
-            if (dueDateTime != null) {
-                taskDueInfo.setDueDateTime(convertZonedDateToUTC(dueDateTime));
-            }
-        }
+        processTaskDueInfo(task);
         return taskRepository.save(task);
     }
 
@@ -140,10 +127,20 @@ public class TaskService {
     }
 
     private void updateSubtasksProject(Task task, BaseProject baseProject) {
-        if (task.getSubtasks() != null) {
+        if (task.getSubtasks() != null && !task.getSubtasks().isEmpty()) {
             for (Task subtask : task.getSubtasks()) {
                 subtask.setProject(baseProject);
                 updateSubtasksProject(subtask, baseProject);
+            }
+        }
+    }
+
+    private void processTaskDueInfo(Task task) {
+        TaskDueInfo taskDueInfo = task.getTaskDueInfo();
+        if (taskDueInfo != null) {
+            ZonedDateTime dueDateTime = taskDueInfo.getDueDateTime();
+            if (dueDateTime != null) {
+                taskDueInfo.setDueDateTime(convertZonedDateToUTC(dueDateTime));
             }
         }
     }
