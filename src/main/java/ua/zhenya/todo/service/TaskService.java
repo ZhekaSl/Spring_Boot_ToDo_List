@@ -105,6 +105,7 @@ public class TaskService {
             }
             oldProject.removeTask(task);
             newProject.addTask(task);
+            updateSubtasksProject(task, newProject);
         }
 
         TaskDueInfo taskDueInfo = task.getTaskDueInfo();
@@ -114,7 +115,6 @@ public class TaskService {
                 taskDueInfo.setDueDateTime(convertZonedDateToUTC(dueDateTime));
             }
         }
-
         return taskRepository.save(task);
     }
 
@@ -137,6 +137,15 @@ public class TaskService {
         ZonedDateTime deadline = now.plus(duration);
 
         return taskRepository.findAllSoonTasks(now, deadline);
+    }
+
+    private void updateSubtasksProject(Task task, BaseProject baseProject) {
+        if (task.getSubtasks() != null) {
+            for (Task subtask : task.getSubtasks()) {
+                subtask.setProject(baseProject);
+                updateSubtasksProject(subtask, baseProject);
+            }
+        }
     }
 
     private ZonedDateTime convertZonedDateToUTC(ZonedDateTime zonedDateTime) {
