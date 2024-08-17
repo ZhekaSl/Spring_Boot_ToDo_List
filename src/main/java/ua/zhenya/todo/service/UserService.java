@@ -1,5 +1,6 @@
 package ua.zhenya.todo.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -52,7 +53,7 @@ public class UserService {
 /*    @Cacheable(value = "users", key = "#id")*/
     public User findById(Integer id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Пользователь с id: " + id + " не найден!"));
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь с id: " + id + " не найден!"));
     }
 
     @Transactional
