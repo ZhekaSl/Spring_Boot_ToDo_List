@@ -53,6 +53,7 @@ public interface TaskMapper {
 
         ZoneId timeZone = dto.getTimeZone() != null ?
                 ZoneId.of(dto.getTimeZone()) : ZoneId.of(ZoneId.systemDefault().getId());
+
         ZonedDateTime zonedDateTime = ZonedDateTime.of(dueDateTime, timeZone);
 
         return TaskDueInfo.builder()

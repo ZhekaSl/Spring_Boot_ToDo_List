@@ -31,6 +31,7 @@ public class TaskService {
     private final UserService userService;
     private final BaseProjectService baseProjectService;
     private final TaskMapper taskMapper;
+    private final TaskDueInfoProcessor taskDueInfoProcessor;
 
 
     @Cacheable(value = "tasks", key = "#id")
@@ -55,7 +56,7 @@ public class TaskService {
 
         Task task = taskMapper.toEntity(taskCreateRequest);
 
-        processTaskDueInfo(task);
+        taskDueInfoProcessor.processTaskDueInfo(task);
         baseProject.addTask(task);
         user.addTask(task);
         return taskRepository.save(task);
@@ -69,9 +70,7 @@ public class TaskService {
         task.setCompleted(!task.isCompleted());
 
         if (task.isCompleted()) {
-            ZoneId zoneId = task.getTaskDueInfo().getTimeZone() != null
-                    ? ZoneId.of(task.getTaskDueInfo().getTimeZone())
-                    : ZoneId.systemDefault();
+            ZoneId zoneId = taskDueInfoProcessor.determineZoneId(task);
             task.setCompletedDateTime(ZonedDateTime.now(zoneId));
         } else {
             task.setCompletedDateTime(null);
@@ -100,8 +99,7 @@ public class TaskService {
             newProject.addTask(task);
             updateSubtasksProject(task, newProject);
         }
-
-        processTaskDueInfo(task);
+        taskDueInfoProcessor.processTaskDueInfo(task);
         return taskRepository.save(task);
     }
 
@@ -133,19 +131,5 @@ public class TaskService {
                 updateSubtasksProject(subtask, baseProject);
             }
         }
-    }
-
-    private void processTaskDueInfo(Task task) {
-        TaskDueInfo taskDueInfo = task.getTaskDueInfo();
-        if (taskDueInfo != null) {
-            ZonedDateTime dueDateTime = taskDueInfo.getDueDateTime();
-            if (dueDateTime != null) {
-                taskDueInfo.setDueDateTime(convertZonedDateToUTC(dueDateTime));
-            }
-        }
-    }
-
-    private ZonedDateTime convertZonedDateToUTC(ZonedDateTime zonedDateTime) {
-        return zonedDateTime.withZoneSameInstant(ZoneOffset.UTC);
     }
 }
