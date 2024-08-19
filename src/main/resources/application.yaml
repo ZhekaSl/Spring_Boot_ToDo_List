@@ -1,11 +1,13 @@
 spring:
-#  cache:
-#    type: redis
-#    cache-names: redis-cache
+  config:
+    import: "optional:file:.env[.properties]"
+  #  cache:
+  #    type: redis
+  #    cache-names: redis-cache
   datasource:
-    url: jdbc:postgresql://localhost:7766/todo_DB
-    username: todolist_user
-    password: 123123@
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DATABASE}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     properties.hibernate:
@@ -18,8 +20,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: zhenya.slepko@gmail.com
-    password: mxcmisxavwbppuqv
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         debug: true
@@ -45,7 +47,7 @@ springdoc:
 
 security:
   jwt:
-    secret: fjsdkfjs;dJGFKsdjgfks;jkg&?fjsdkfj;gj"JKASDJGDSKGdjkfs=fjdskf42dajjik9=8
-    access: 1800000
-    refresh: 2592000000
+    secret: ${JWT_SECRET}
+    access: ${JWT_ACCESS}
+    refresh: ${JWT_REFRESH}
 
