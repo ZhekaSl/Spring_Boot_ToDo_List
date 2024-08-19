@@ -2,6 +2,7 @@ package ua.zhenya.todo.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -100,7 +101,6 @@ public class TaskServiceTest extends IntegrationTestBase {
         assertEquals(project.getId(), createdTask.getProject().getId());
         assertEquals(user.getId(), createdTask.getUser().getId());
 
-
         User updatedUser = userRepository.findById(user.getId()).orElseThrow();
         assertTrue(updatedUser.getTasks().contains(createdTask));
 
@@ -138,26 +138,20 @@ public class TaskServiceTest extends IntegrationTestBase {
 
     @Test
     void findAll_ShouldReturnTasksForUserAndSupportPagination() {
-        // Arrange
         User user = userRepository.save(TestEntityFactory.createDefaultUser());
         BaseProject project = projectRepository.save(TestEntityFactory.createDefaultProject(user));
 
-        // Создаем 3 задачи
         Task task1 = taskRepository.save(TestEntityFactory.createDefaultTask(user, project));
         Task task2 = taskRepository.save(TestEntityFactory.createDefaultTask(user, project));
         Task task3 = taskRepository.save(TestEntityFactory.createDefaultTask(user, project));
 
-        // Запрашиваем первую страницу с 2 задачами, сортируя по ID
         Pageable pageable = PageRequest.of(0, 2, Sort.by("id"));
 
-        // Act
         Page<Task> firstPage = taskService.findAll(user.getId(), pageable);
 
-        // Запрашиваем вторую страницу с 1 задачей, сортируя по ID
         Pageable secondPageable = PageRequest.of(1, 2, Sort.by("id"));
         Page<Task> secondPage = taskService.findAll(user.getId(), secondPageable);
 
-        // Assert
         assertNotNull(firstPage);
         assertEquals(2, firstPage.getNumberOfElements()); // На первой странице 2 задачи
         assertEquals(task1.getId(), firstPage.getContent().get(0).getId());
@@ -170,14 +164,11 @@ public class TaskServiceTest extends IntegrationTestBase {
 
     @Test
     void findAll_ShouldReturnEmptyPageIfNoTasks() {
-        // Arrange
         User user = userRepository.save(TestEntityFactory.createDefaultUser());
         Pageable pageable = PageRequest.of(0, 10);
 
-        // Act
         Page<Task> tasksPage = taskService.findAll(user.getId(), pageable);
 
-        // Assert
         assertNotNull(tasksPage);
         assertTrue(tasksPage.isEmpty());
     }
@@ -205,7 +196,6 @@ public class TaskServiceTest extends IntegrationTestBase {
 
     @Test
     void findAllSoonTasks_ShouldReturnTasksWithDeadlineInFuture() {
-        // Arrange
         User user = userRepository.save(TestEntityFactory.createDefaultUser());
         BaseProject project = projectRepository.save(TestEntityFactory.createDefaultProject(user));
         Task task1 = TestEntityFactory.createDefaultTask(user, project);
@@ -215,10 +205,8 @@ public class TaskServiceTest extends IntegrationTestBase {
         taskRepository.save(task1);
         taskRepository.save(task2);
 
-        // Act
         List<Task> result = taskService.findAllSoonTasks(Duration.ofDays(1));
 
-        // Assert
         assertNotNull(result);
         assertEquals(2, result.size());
     }
@@ -262,8 +250,7 @@ public class TaskServiceTest extends IntegrationTestBase {
     }
 
     @Test
-    void update_ShouldChangeProjectCorrectly() {
-        // Arrange
+    void update_ShouldUpdateProjectCorrectly() {
         User user = userRepository.save(TestEntityFactory.createDefaultUser());
         BaseProject oldProject = projectRepository.save(TestEntityFactory.createDefaultProject(user));
         BaseProject newProject = inboxRepository.save(TestEntityFactory.createInbox(user));
@@ -277,10 +264,8 @@ public class TaskServiceTest extends IntegrationTestBase {
                 newProject.getId()
         );
 
-        // Act
         Task updatedTask = taskService.update(task.getId(), updateRequest);
 
-        // Assert
         assertNotNull(updatedTask);
         assertEquals(newProject.getId(), updatedTask.getProject().getId());
         assertFalse(oldProject.getTasks().contains(updatedTask));
@@ -300,7 +285,8 @@ public class TaskServiceTest extends IntegrationTestBase {
     }
 
     @Test
-    void update_ShouldChangeSubtasksProjectCorrectlyIfParentTaskProjectIsChanged() {
+    @DisplayName("Should update subtask's project if parent task's project is updated")
+    void update_ShouldUpdateSubtasksProjectCorrectlyIfParentTaskProjectIsUpdated() {
         User user = userRepository.save(TestEntityFactory.createDefaultUser());
         BaseProject oldProject = projectRepository.save(TestEntityFactory.createDefaultProject(user));
         BaseProject newProject = inboxRepository.save(TestEntityFactory.createInbox(user));
@@ -326,6 +312,103 @@ public class TaskServiceTest extends IntegrationTestBase {
         }
         assertEquals(newProject.getId(), subtaskOfSubtask.getProject().getId());
     }
+
+    @Test
+    void update_ShouldNotUpdateProjectIfProjectIdIsNullOrTheSame() {
+        User user = userRepository.save(TestEntityFactory.createDefaultUser());
+        BaseProject project = projectRepository.save(TestEntityFactory.createDefaultProject(user));
+        Task task = taskRepository.save(TestEntityFactory.createDefaultTask(user, project));
+
+        TaskCreateRequest updateRequestWithNullProject = new TaskCreateRequest(
+                task.getName(),
+                task.getDescription(),
+                null,
+                task.getPriority(),
+                null
+        );
+
+        Task updatedTask1 = taskService.update(task.getId(), updateRequestWithNullProject);
+
+        assertEquals(project.getId(), updatedTask1.getProject().getId());
+    }
+
+    @Test
+    @DisplayName("Should remove subtask from parent if subtask's project is changed")
+    void update_ShouldRemoveTaskFromParentSubtasksWhenProjectChanges() {
+        User user = userRepository.save(TestEntityFactory.createDefaultUser());
+        BaseProject oldProject = projectRepository.save(TestEntityFactory.createDefaultProject(user));
+        BaseProject newProject = projectRepository.save(TestEntityFactory.createDefaultProject(user));
+
+        Task parentTask = taskRepository.save(TestEntityFactory.createTaskWithSubtasks(user, oldProject));
+
+        Task subtask = parentTask.getSubtasks().get(0);
+
+        TaskCreateRequest updateRequest = new TaskCreateRequest(
+                subtask.getName(),
+                subtask.getDescription(),
+                null,
+                subtask.getPriority(),
+                newProject.getId()
+        );
+        Task updatedSubtask = taskService.update(subtask.getId(), updateRequest);
+
+        assertNotNull(updatedSubtask);
+        assertEquals(newProject.getId(), updatedSubtask.getProject().getId());
+        assertFalse(parentTask.getSubtasks().contains(subtask));
+        assertTrue(newProject.getTasks().contains(updatedSubtask));
+        assertFalse(oldProject.getTasks().contains(updatedSubtask));
+    }
+
+    @Test
+    void delete_ShouldRemoveTask() {
+        User user = userRepository.save(TestEntityFactory.createDefaultUser());
+        BaseProject project = projectRepository.save(TestEntityFactory.createDefaultProject(user));
+        Task task = taskRepository.save(TestEntityFactory.createDefaultTask(user, project));
+
+        taskService.delete(task.getId());
+
+        assertFalse(taskRepository.findById(task.getId()).isPresent());
+        assertFalse(user.getTasks().contains(task));
+        assertFalse(project.getTasks().contains(task));
+    }
+
+    @Test
+    void delete_ShouldRemoveTaskWithSubtasks() {
+        User user = userRepository.save(TestEntityFactory.createDefaultUser());
+        BaseProject project = projectRepository.save(TestEntityFactory.createDefaultProject(user));
+        Task parentTask = taskRepository.save(TestEntityFactory.createTaskSubtasksAndChecklistItems(user, project));
+
+        taskService.delete(parentTask.getId());
+
+        assertFalse(taskRepository.findById(parentTask.getId()).isPresent());
+        parentTask.getSubtasks().forEach(subtask ->
+                assertFalse(taskRepository.findById(subtask.getId()).isPresent()));
+
+        parentTask.getChecklistItems().forEach(checklistItem ->
+                assertFalse(taskRepository.findById(checklistItem.getId()).isPresent()));
+    }
+
+    @Test
+    void delete_ShouldDeleteSubtask() {
+        User user = userRepository.save(TestEntityFactory.createDefaultUser());
+        BaseProject project = projectRepository.save(TestEntityFactory.createDefaultProject(user));
+        Task parentTask = taskRepository.save(TestEntityFactory.createTaskSubtasksAndChecklistItems(user, project));
+        Task subtask = parentTask.getSubtasks().get(0);
+
+        taskService.delete(subtask.getId());
+
+        assertFalse(parentTask.getSubtasks().contains(subtask));
+        assertFalse(taskRepository.findById(subtask.getId()).isPresent());
+        assertTrue(taskRepository.findById(parentTask.getId()).isPresent());
+    }
+
+    @Test
+    void delete_ShouldThrowExceptionWhenTaskNotFound() {
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+                () -> taskService.delete(-1));
+        assertEquals("Задача с id: -1 не найдена!", exception.getMessage());
+    }
+
 }
 
 

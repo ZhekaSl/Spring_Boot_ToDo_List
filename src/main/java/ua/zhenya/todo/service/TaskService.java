@@ -95,6 +95,7 @@ public class TaskService {
             if (task.getParentTask() != null) {
                 task.getParentTask().removeSubtask(task);
             }
+
             oldProject.removeTask(task);
             newProject.addTask(task);
             updateSubtasksProject(task, newProject);
