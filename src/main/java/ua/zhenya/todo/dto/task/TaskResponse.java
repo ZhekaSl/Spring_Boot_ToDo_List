@@ -1,5 +1,6 @@
 package ua.zhenya.todo.dto.task;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Value;
 import ua.zhenya.todo.dto.checklist.ChecklistItemResponse;
 import ua.zhenya.todo.model.Priority;

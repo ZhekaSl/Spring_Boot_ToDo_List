@@ -2,6 +2,8 @@ package ua.zhenya.todo.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import ua.zhenya.todo.project.BaseProject;
 import ua.zhenya.todo.project.Project;
 
@@ -48,11 +50,11 @@ public class Task implements BaseEntity<Integer>, Serializable {
     @ToString.Exclude
     private User user;
 
-    @OneToMany(mappedBy = "parentTask", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "parentTask", cascade = CascadeType.ALL,  fetch = FetchType.LAZY)
     @ToString.Exclude
     private List<Task> subtasks = new ArrayList<>();
 
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true,  fetch = FetchType.LAZY)
     @ToString.Exclude
     private List<ChecklistItem> checklistItems = new ArrayList<>();
 

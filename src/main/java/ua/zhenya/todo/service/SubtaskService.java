@@ -10,10 +10,7 @@ import ua.zhenya.todo.mappers.TaskMapper;
 import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.model.User;
 import ua.zhenya.todo.project.BaseProject;
-import ua.zhenya.todo.project.Project;
-import ua.zhenya.todo.project.ProjectPermission;
 import ua.zhenya.todo.repository.TaskRepository;
-import ua.zhenya.todo.utils.TaskUtils;
 
 @Service
 @RequiredArgsConstructor

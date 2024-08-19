@@ -17,7 +17,6 @@ import java.util.Optional;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Integer> {
-    @EntityGraph(attributePaths = {"checklistItems"})
     Page<Task> findAllByUserIdAndParentTaskIsNull(Integer userId, Pageable pageable);
 
     Page<Task> findAllByParentTask(Task parentTask, Pageable pageable);

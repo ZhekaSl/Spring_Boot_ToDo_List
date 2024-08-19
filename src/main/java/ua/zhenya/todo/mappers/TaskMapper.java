@@ -1,6 +1,7 @@
 package ua.zhenya.todo.mappers;
 
 import org.mapstruct.*;
+import ua.zhenya.todo.dto.task.SubtaskResponse;
 import ua.zhenya.todo.dto.task.TaskCreateRequest;
 import ua.zhenya.todo.dto.task.TaskDueDetailsDTO;
 import ua.zhenya.todo.dto.task.TaskResponse;
@@ -12,7 +13,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {ChecklistItemMapper.class, SubtaskMapper.class})
+@Mapper(componentModel = "spring", uses = {ChecklistItemMapper.class})
 public interface TaskMapper {
 
     @Mapping(target = "due", source = "taskDueInfo", qualifiedByName = "dueInfoToDueDto")
@@ -28,6 +29,11 @@ public interface TaskMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
     void update(TaskCreateRequest taskCreateRequest, @MappingTarget Task task);
 
+    @Mapping(target = "taskDueDetailsDTO", source = "taskDueInfo", qualifiedByName = "dueInfoToDueDto")
+    @Mapping(source = "name", target = "title")
+    SubtaskResponse toSubtaskResponse(Task subtask);
+
+    List<SubtaskResponse> toSubtaskResponseList(List<Task> tasks);
     List<TaskResponse> toResponseList(List<Task> tasks);
 
     @Named("dueInfoToDueDto")
@@ -61,4 +67,5 @@ public interface TaskMapper {
                 .timeZone(timeZone.getId())
                 .build();
     }
+
 }
