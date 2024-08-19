@@ -1,5 +1,6 @@
 package ua.zhenya.todo.motherObjects;
 
+import ua.zhenya.todo.dto.project.ProjectRequest;
 import ua.zhenya.todo.dto.task.TaskCreateRequest;
 import ua.zhenya.todo.dto.task.TaskDueDetailsDTO;
 import ua.zhenya.todo.model.*;
@@ -16,6 +17,15 @@ public class TestEntityFactory {
     public static User createDefaultUser() {
         User user = new User();
         user.setEmail("user@example.com");
+        user.setPassword("password");
+        user.setFirstname("John");
+        user.setBirthDate(LocalDate.of(1990, 1, 1));
+        return user;
+    }
+
+    public static User createDefaultUser(String email) {
+        User user = new User();
+        user.setEmail(email);
         user.setPassword("password");
         user.setFirstname("John");
         user.setBirthDate(LocalDate.of(1990, 1, 1));
@@ -127,5 +137,9 @@ public class TestEntityFactory {
                 Priority.MEDIUM,
                 projectId
         );
+    }
+
+    public static ProjectRequest createDefaultProjectRequest() {
+        return new ProjectRequest("MyProject", "blue");
     }
 }
