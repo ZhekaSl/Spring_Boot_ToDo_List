@@ -30,10 +30,6 @@ public class ProjectService {
                 .orElseThrow(() -> new EntityNotFoundException("Проект с айди: " + projectId + " не найден!"));
     }
 
-    public Project save(Project project) {
-        return projectRepository.save(project);
-    }
-
     @Transactional
     public Project create(Integer userId, ProjectRequest request) {
         User user = userService.findById(userId);
@@ -41,7 +37,7 @@ public class ProjectService {
         Project project = projectMapper.toEntity(request);
         user.addProject(project);
 
-        return save(project);
+        return projectRepository.save(project);
     }
 
     @Transactional
@@ -49,7 +45,7 @@ public class ProjectService {
         Project project = findById(id);
         projectMapper.update(projectRequest, project);
 
-        return save(project);
+        return projectRepository.save(project);
     }
 
     @Transactional
@@ -64,30 +60,8 @@ public class ProjectService {
                 .project(project)
                 .permission(permission)
                 .build();
-
         userProject.setProject(project);
         userProject.setUser(user);
-        save(project);
-    }
-
-
-    @Transactional
-    public void delete(String projectId) {
-        Project project = findById(projectId);
-        User user = project.getOwner();
-        user.removeProject(project);
-        projectRepository.delete(project);
-    }
-
-    public Page<Project> findAll(Integer userId, Pageable pageable) {
-        User user = userService.findById(userId);
-        return projectRepository.findAllByUserId(user.getId(), pageable);
-    }
-
-    
-    public Page<UserProject> findAllMembers(String projectId, Pageable pageable) {
-        Project project = findById(projectId);
-        return userProjectRepository.findAllByProject(project, pageable);
     }
 
     @Transactional
@@ -104,6 +78,57 @@ public class ProjectService {
 
         userProject.removeUser();
         userProject.removeProject();
-        save(project);
+        projectRepository.save(project);
+    }
+
+    @Transactional
+    public void delete(String projectId) {
+        Project project = findById(projectId);
+        User user = project.getOwner();
+        user.removeProject(project);
+        projectRepository.delete(project);
+    }
+
+    public Page<Project> findAll(Integer userId, Pageable pageable) {
+        User user = userService.findById(userId);
+        return projectRepository.findAllByUserId(user.getId(), pageable);
+    }
+
+    public Page<UserProject> findAllMembers(String projectId, Pageable pageable) {
+        Project project = findById(projectId);
+        return userProjectRepository.findAllByProject(project, pageable);
+    }
+
+    @Transactional
+    public Project setInviteUrlEnabled(String projectId, boolean inviteUrlEnabled) {
+        Project project = findById(projectId);
+        project.setInviteUrlEnabled(inviteUrlEnabled);
+
+        if (!inviteUrlEnabled) {
+            project.setDefaultPermission(null);
+            project.setApprovalRequired(false);
+        }
+
+        return projectRepository.save(project);
+    }
+
+    @Transactional
+    public Project setDefaultPermission(String projectId, ProjectPermission defaultPermission) {
+        Project project = findById(projectId);
+        if (!project.isInviteUrlEnabled()) {
+            throw new IllegalStateException("DefaultPermission can only be set if inviteUrlEnabled is true.");
+        }
+        project.setDefaultPermission(defaultPermission);
+        return projectRepository.save(project);
+    }
+
+    @Transactional
+    public Project setApprovalRequired(String projectId, boolean approvalRequired) {
+        Project project = findById(projectId);
+        if (!project.isInviteUrlEnabled()) {
+            throw new IllegalStateException("ApprovalRequired can only be set if inviteUrlEnabled is true.");
+        }
+        project.setApprovalRequired(approvalRequired);
+        return projectRepository.save(project);
     }
 }
