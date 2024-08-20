@@ -153,12 +153,12 @@ public class TaskServiceTest extends IntegrationTestBase {
         Page<Task> secondPage = taskService.findAll(user.getId(), secondPageable);
 
         assertNotNull(firstPage);
-        assertEquals(2, firstPage.getNumberOfElements()); // На первой странице 2 задачи
+        assertEquals(2, firstPage.getNumberOfElements());
         assertEquals(task1.getId(), firstPage.getContent().get(0).getId());
         assertEquals(task2.getId(), firstPage.getContent().get(1).getId());
 
         assertNotNull(secondPage);
-        assertEquals(1, secondPage.getNumberOfElements()); // На второй странице 1 задача
+        assertEquals(1, secondPage.getNumberOfElements());
         assertEquals(task3.getId(), secondPage.getContent().get(0).getId());
     }
 
