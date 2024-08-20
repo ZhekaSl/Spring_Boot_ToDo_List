@@ -3,8 +3,6 @@ package ua.zhenya.todo.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.zhenya.todo.dto.checklist.ChecklistItemCreateRequest;
@@ -13,7 +11,6 @@ import ua.zhenya.todo.mappers.ChecklistItemMapper;
 import ua.zhenya.todo.model.ChecklistItem;
 import ua.zhenya.todo.model.Task;
 import ua.zhenya.todo.repository.ChecklistItemRepository;
-import ua.zhenya.todo.utils.TaskUtils;
 
 @Service
 @RequiredArgsConstructor

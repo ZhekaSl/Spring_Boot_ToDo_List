@@ -12,7 +12,6 @@ import ua.zhenya.todo.model.User;
 import ua.zhenya.todo.project.*;
 import ua.zhenya.todo.repository.ProjectRepository;
 import ua.zhenya.todo.repository.UserProjectRepository;
-import ua.zhenya.todo.utils.TaskUtils;
 
 import java.util.Objects;
 
