@@ -89,7 +89,7 @@ public class User implements BaseEntity<Integer>, Serializable {
 
     public void addSentInvitation(Invitation invitation) {
         this.sentInvitations.add(invitation);
-        invitation.setToUser(this);
+        invitation.setFromUser(this);
     }
 
 }

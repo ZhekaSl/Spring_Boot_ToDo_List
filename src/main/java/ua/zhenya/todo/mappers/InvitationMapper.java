@@ -1,7 +1,6 @@
 package ua.zhenya.todo.mappers;
 
 import org.mapstruct.*;
-import org.springframework.transaction.annotation.Transactional;
 import ua.zhenya.todo.dto.invitation.InvitationCreateRequest;
 import ua.zhenya.todo.dto.invitation.InvitationResponse;
 import ua.zhenya.todo.project.Invitation;
@@ -16,7 +15,4 @@ public interface InvitationMapper {
     @Mapping(target = "fromEmail", expression = "java(invitation.getFromUser().getEmail())")
     @Mapping(target = "toEmail", expression = "java(invitation.getToUser().getEmail())")
     InvitationResponse toResponse(Invitation invitation);
-
-/*    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void update(InvitationCreateRequest invitationCreateRequest, @MappingTarget Invitation invitation);*/
 }
