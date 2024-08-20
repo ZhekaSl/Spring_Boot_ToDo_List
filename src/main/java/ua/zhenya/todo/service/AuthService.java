@@ -43,12 +43,7 @@ public class AuthService {
     }
 
     public User register(RegistrationUserRequest registrationUserRequest) {
-        try {
-            userService.findByEmail(registrationUserRequest.getEmail());
-            throw new IllegalArgumentException("Пользователь с указанным email уже существует!");
-        } catch (UsernameNotFoundException e) {
-            return userService.create(registrationUserRequest);
-        }
+        return userService.create(registrationUserRequest);
     }
 
     public JwtResponse refresh(String refreshToken) {

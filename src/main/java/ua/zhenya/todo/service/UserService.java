@@ -65,6 +65,9 @@ public class UserService {
         if (!userDTO.getPassword().equals(userDTO.getConfirmPassword()))
             throw new IllegalArgumentException("Пароли не совпадают!");
 
+        if (findByEmail(userDTO.getEmail()) != null)
+            throw new IllegalArgumentException("Пользователь с таким email уже существует!");
+
         return Optional.of(userDTO)
                 .map(userMapper::toEntity)
                 .map(user -> {
@@ -114,5 +117,4 @@ public class UserService {
                 })
                 .orElse(false);
     }
-
 }
