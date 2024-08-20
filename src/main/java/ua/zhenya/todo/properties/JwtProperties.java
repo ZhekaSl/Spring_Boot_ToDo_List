@@ -1,4 +1,4 @@
-package ua.zhenya.todo.service.properties;
+package ua.zhenya.todo.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

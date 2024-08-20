@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import ua.zhenya.todo.model.Role;
 import ua.zhenya.todo.model.User;
 import ua.zhenya.todo.service.UserService;
-import ua.zhenya.todo.service.properties.JwtProperties;
+import ua.zhenya.todo.properties.JwtProperties;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;

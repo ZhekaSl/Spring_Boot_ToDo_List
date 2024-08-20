@@ -33,12 +33,6 @@ public class TaskService {
     private final TaskMapper taskMapper;
     private final TaskDueInfoProcessor taskDueInfoProcessor;
 
-
-    @Cacheable(value = "tasks", key = "#id")
-    public Task findByIdCached(Integer id) {
-        return findById(id);
-    }
-
     public Task findById(Integer id) {
         return taskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Задача с id: " + id + " не найдена!"));
@@ -66,7 +60,6 @@ public class TaskService {
     }
 
     @Transactional
-    @CachePut(value = "tasks", key = "#id")
     public Task complete(Integer id) {
         Task task = findById(id);
 
@@ -82,9 +75,7 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-
     @Transactional
-    @CachePut(value = "tasks", key = "#id")
     public Task update(Integer id, TaskCreateRequest taskUpdateRequest) {
         Task task = findById(id);
 
@@ -108,7 +99,6 @@ public class TaskService {
     }
 
     @Transactional
-    @CacheEvict(value = "tasks", key = "#id")
     public void delete(Integer id) {
         Task task = findById(id);
         Task parentTask = task.getParentTask();

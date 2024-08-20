@@ -5,11 +5,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ua.zhenya.todo.dto.PageResponse;
 import ua.zhenya.todo.dto.user.UserResponse;
 import ua.zhenya.todo.dto.user.UserUpdateRequest;
 import ua.zhenya.todo.mappers.UserMapper;
+import ua.zhenya.todo.security.expression.CustomSecurityExpression;
 import ua.zhenya.todo.service.UserService;
 
 @RestController
@@ -39,7 +41,6 @@ public class UserController {
         UserResponse user = userMapper.toResponse(userService.update(id, userDTO));
         return ResponseEntity.ok(user);
     }
-
 
 /*    @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Integer id) {
