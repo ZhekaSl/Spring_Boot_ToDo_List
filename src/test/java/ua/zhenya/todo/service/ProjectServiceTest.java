@@ -90,7 +90,6 @@ class ProjectServiceTest extends IntegrationTestBase {
         Project project = projectRepository.save(TestEntityFactory.createDefaultProject(defaultUser));
         User newUser = userRepository.save(TestEntityFactory.createDefaultUser("user549@gmail.com"));
 
-//        projectService.addMember(project.getId(), newUser.getId(), ProjectPermission.WRITE);
         UserProject userProject = new UserProject(new UserProjectId(newUser.getId(), project.getId()), newUser, project, ProjectPermission.WRITE);
         userProject.setProject(project);
         userProject.setUser(newUser);
@@ -100,7 +99,6 @@ class ProjectServiceTest extends IntegrationTestBase {
         Page<UserProject> members = userProjectRepository.findAllByProject(project, PageRequest.of(0, 10));
         assertEquals(0, members.getTotalElements());
 
-        // Verify that the association between user and project has been removed
         assertFalse(userProjectRepository.findByProjectAndUser(project, newUser).isPresent());
     }
 
@@ -191,14 +189,11 @@ class ProjectServiceTest extends IntegrationTestBase {
     @Test
     void delete_ShouldRemoveProjectAndUpdateUser() {
         Project project = projectRepository.save(TestEntityFactory.createDefaultProject(defaultUser));
-        // Удаляем проект
         projectService.delete(project.getId());
 
-        // Проверка, что проект удален из базы данных
         Optional<Project> deletedProject = projectRepository.findById(project.getId());
         assertFalse(deletedProject.isPresent());
 
-        // Проверка, что проект удален из списка проектов пользователя
         User updatedOwner = userRepository.findById(defaultUser.getId()).get();
         assertFalse(updatedOwner.getProjects().contains(project));
     }

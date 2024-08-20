@@ -1,16 +1,20 @@
 package ua.zhenya.todo.motherObjects;
 
+import ua.zhenya.todo.dto.checklist.ChecklistItemResponse;
+import ua.zhenya.todo.dto.invitation.InvitationCreateRequest;
 import ua.zhenya.todo.dto.project.ProjectRequest;
+import ua.zhenya.todo.dto.task.SubtaskResponse;
 import ua.zhenya.todo.dto.task.TaskCreateRequest;
 import ua.zhenya.todo.dto.task.TaskDueDetailsDTO;
+import ua.zhenya.todo.dto.task.TaskResponse;
 import ua.zhenya.todo.model.*;
-import ua.zhenya.todo.project.BaseProject;
-import ua.zhenya.todo.project.Inbox;
-import ua.zhenya.todo.project.Project;
+import ua.zhenya.todo.project.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class TestEntityFactory {
 
@@ -142,4 +146,80 @@ public class TestEntityFactory {
     public static ProjectRequest createDefaultProjectRequest() {
         return new ProjectRequest("MyProject", "blue");
     }
+
+    public static TaskResponse createTaskResponse(Task task) {
+        return new TaskResponse(
+                task.getId(),
+                task.getName(),
+                task.getDescription(),
+                createTaskDueDetailsDTO(task.getTaskDueInfo()),
+                task.isCompleted(),
+                task.getCompletedDateTime(),
+                task.getPriority(),
+                task.getParentTask() != null ? task.getParentTask().getId() : null,
+                task.getProject() != null ? task.getProject().getId() : null,
+                task.getUser() != null ? task.getUser().getId() : null,
+                createChecklistItemResponses(task.getChecklistItems()),
+                createSubtaskResponses(task.getSubtasks())
+        );
+    }
+
+    private static TaskDueDetailsDTO createTaskDueDetailsDTO(TaskDueInfo taskDueInfo) {
+        if (taskDueInfo == null) {
+            return null;
+        }
+        return new TaskDueDetailsDTO(
+                taskDueInfo.getDueDateTime().toLocalDateTime(),
+                taskDueInfo.getTimeZone()
+        );
+    }
+
+    private static List<ChecklistItemResponse> createChecklistItemResponses(List<ChecklistItem> checklistItems) {
+        return checklistItems.stream()
+                .map(item -> new ChecklistItemResponse(item.getId(), item.getTitle(), item.isCompleted()))
+                .collect(Collectors.toList());
+    }
+
+    private static List<SubtaskResponse> createSubtaskResponses(List<Task> subtasks) {
+        return subtasks.stream()
+                .map(subtask -> new SubtaskResponse(
+                        subtask.getId(),
+                        subtask.getName(),
+                        subtask.getPriority(),
+                        createTaskDueDetailsDTO(subtask.getTaskDueInfo()),
+                        subtask.isCompleted()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public static Invitation createDefaultInvitation(User fromUser, User toUser, Project project) {
+        Invitation invitation = new Invitation();
+        invitation.setFromUser(fromUser);
+        invitation.setToUser(toUser);
+        invitation.setProject(project);
+        invitation.setStatus(InvitationStatus.PENDING);
+        invitation.setPermission(ProjectPermission.READ);
+
+        fromUser.addSentInvitation(invitation);
+        toUser.addReceivedInvitation(invitation);
+        project.addInvitation(invitation);
+        return invitation;
+    }
+
+    public static InvitationCreateRequest createDefaultInvitationCreateRequest(User toUser, ProjectPermission permission) {
+        return new InvitationCreateRequest(toUser.getEmail(), permission);
+    }
+
+    public static UserProject createDefaultUserProject(User user, Project project, ProjectPermission permission) {
+        UserProjectId userProjectId = new UserProjectId(user.getId(), project.getId());
+
+        UserProject userProject = new UserProject();
+        userProject.setId(userProjectId);
+        userProject.setUser(user);
+        userProject.setProject(project);
+        userProject.setPermission(permission);
+
+        return userProject;
+    }
 }
+

@@ -47,15 +47,6 @@ public class TaskServiceTest extends IntegrationTestBase {
     @Autowired
     private InboxRepository inboxRepository;
 
-    private User defaultUser;
-    private Project defaultProject;
-    private TaskCreateRequest defaultCreateRequest;
-    private Task defaultTask;
-
-    @BeforeEach
-    void setUp() {
-    }
-
     @Test
     void findById_ShouldReturnTaskIfExists() {
         User user = userRepository.save(TestEntityFactory.createDefaultUser());
