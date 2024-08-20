@@ -29,15 +29,7 @@ public class ChecklistItemService {
                 .orElseThrow(() -> new EntityNotFoundException("Checklist с id: " + id + " не найден!"));
     }
 
-
-    public Page<ChecklistItem> findAll(Integer taskId, Pageable pageable) {
-        Task task = taskService.findById(taskId);
-
-        return checklistItemRepository.findAllByTask(task, pageable);
-    }
-
     @Transactional
-
     public ChecklistItem create(Integer taskId, ChecklistItemCreateRequest checklistItemCreateRequest) {
         Task task = taskService.findById(taskId);
 
@@ -79,8 +71,9 @@ public class ChecklistItemService {
         checklistItemRepository.delete(checklistItem);
     }
 
-    private static void checkTaskContainsChecklistItem(Task task, ChecklistItem checklistItem) {
-        if (!task.getChecklistItems().contains(checklistItem)) {
+    private void checkTaskContainsChecklistItem(Task task, ChecklistItem checklistItem) {
+        boolean exists = checklistItemRepository.existsByIdAndTaskId(checklistItem.getId(), task.getId());
+        if (!exists) {
             throw new EntityNotFoundException("Checklist item с id: " + checklistItem.getId() + " не найден!");
         }
     }

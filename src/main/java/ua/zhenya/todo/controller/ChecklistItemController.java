@@ -23,14 +23,6 @@ public class ChecklistItemController {
     private final ChecklistItemService checklistItemService;
     private final ChecklistItemMapper checklistItemMapper;
 
-    @PreAuthorize("@customSecurityExpression.canAccessTask(#taskId)")
-    @GetMapping
-    public ResponseEntity<PageResponse<ChecklistItemResponse>> findAll(@PathVariable Integer taskId, Pageable pageable) {
-        Page<ChecklistItemResponse> page = checklistItemService.findAll(taskId, pageable)
-                .map(checklistItemMapper::toResponse);
-        return ResponseEntity.ok(PageResponse.of(page));
-    }
-
     @PreAuthorize("@customSecurityExpression.canModifyTask(#taskId)")
     @PostMapping
     public ResponseEntity<ChecklistItemResponse> create(@PathVariable Integer taskId, ChecklistItemCreateRequest checkListItemCreateRequest) {

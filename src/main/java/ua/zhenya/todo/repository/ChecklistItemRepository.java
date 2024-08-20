@@ -10,4 +10,6 @@ import ua.zhenya.todo.model.Task;
 @Repository
 public interface ChecklistItemRepository extends JpaRepository<ChecklistItem, Integer> {
     Page<ChecklistItem> findAllByTask(Task task, Pageable pageable);
+
+    boolean existsByIdAndTaskId(Integer id, Integer taskId);
 }
