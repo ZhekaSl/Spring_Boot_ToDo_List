@@ -1,5 +1,6 @@
 package ua.zhenya.todo.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +13,12 @@ import ua.zhenya.todo.motherObjects.TestEntityFactory;
 import ua.zhenya.todo.project.Project;
 import ua.zhenya.todo.project.ProjectPermission;
 import ua.zhenya.todo.project.UserProject;
+import ua.zhenya.todo.project.UserProjectId;
 import ua.zhenya.todo.repository.ProjectRepository;
 import ua.zhenya.todo.repository.UserProjectRepository;
 import ua.zhenya.todo.repository.UserRepository;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -82,6 +86,55 @@ class ProjectServiceTest extends IntegrationTestBase {
     }
 
     @Test
+    void removeMember_ShouldRemoveMemberFromProject() {
+        Project project = projectRepository.save(TestEntityFactory.createDefaultProject(defaultUser));
+        User newUser = userRepository.save(TestEntityFactory.createDefaultUser("user549@gmail.com"));
+
+//        projectService.addMember(project.getId(), newUser.getId(), ProjectPermission.WRITE);
+        UserProject userProject = new UserProject(new UserProjectId(newUser.getId(), project.getId()), newUser, project, ProjectPermission.WRITE);
+        userProject.setProject(project);
+        userProject.setUser(newUser);
+
+        projectService.removeMember(project.getId(), newUser.getId());
+
+        Page<UserProject> members = userProjectRepository.findAllByProject(project, PageRequest.of(0, 10));
+        assertEquals(0, members.getTotalElements());
+
+        // Verify that the association between user and project has been removed
+        assertFalse(userProjectRepository.findByProjectAndUser(project, newUser).isPresent());
+    }
+
+    @Test
+    void removeMember_ShouldThrowExceptionWhenRemovingOwner() {
+        Project project = projectRepository.save(TestEntityFactory.createDefaultProject(defaultUser));
+        User owner = project.getOwner();
+
+        Exception exception = assertThrows(UnsupportedOperationException.class, () -> {
+            projectService.removeMember(project.getId(), owner.getId());
+        });
+
+        String expectedMessage = "Владелец проекта не может удалить из проекта самого себя!";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    void removeMember_ShouldThrowExceptionWhenUserNotMemberOfProject() {
+        Project project = projectRepository.save(TestEntityFactory.createDefaultProject(defaultUser));
+        User newUser = userRepository.save(TestEntityFactory.createDefaultUser("user43@gmail.com "));
+
+        Exception exception = assertThrows(EntityNotFoundException.class, () -> {
+            projectService.removeMember(project.getId(), newUser.getId());
+        });
+
+        String expectedMessage = "Пользователь не является участником проекта";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
     void findAll_ShouldReturnProjectsForUserAndSupportPagination() {
         Project project1 = projectRepository.save(TestEntityFactory.createDefaultProject(defaultUser));
         Project project2 = projectRepository.save(TestEntityFactory.createDefaultProject(defaultUser));
@@ -133,6 +186,21 @@ class ProjectServiceTest extends IntegrationTestBase {
         Page<UserProject> result = projectService.findAllMembers(project.getId(), PageRequest.of(0, 2));
 
         assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void delete_ShouldRemoveProjectAndUpdateUser() {
+        Project project = projectRepository.save(TestEntityFactory.createDefaultProject(defaultUser));
+        // Удаляем проект
+        projectService.delete(project.getId());
+
+        // Проверка, что проект удален из базы данных
+        Optional<Project> deletedProject = projectRepository.findById(project.getId());
+        assertFalse(deletedProject.isPresent());
+
+        // Проверка, что проект удален из списка проектов пользователя
+        User updatedOwner = userRepository.findById(defaultUser.getId()).get();
+        assertFalse(updatedOwner.getProjects().contains(project));
     }
 
 }
