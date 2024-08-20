@@ -65,7 +65,7 @@ public class UserService {
         if (!userDTO.getPassword().equals(userDTO.getConfirmPassword()))
             throw new IllegalArgumentException("Пароли не совпадают!");
 
-        if (findByEmail(userDTO.getEmail()) != null)
+        if (userRepository.findByEmail(userDTO.getEmail()).isPresent())
             throw new IllegalArgumentException("Пользователь с таким email уже существует!");
 
         return Optional.of(userDTO)
