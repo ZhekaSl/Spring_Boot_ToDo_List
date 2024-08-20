@@ -17,7 +17,12 @@ import java.util.Optional;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Integer> {
-    Page<Task> findAllByUserIdAndParentTaskIsNull(Integer userId, Pageable pageable);
+    @Query("select t from Task t left join fetch t.subtasks where t.parentTask is null and t.user.id = :userId")
+    Page<Task> findAllParentTasksWithSubtasks(Integer userId, Pageable pageable);
+
+    @Query("select t from Task t left join fetch t.checklistItems where t.parentTask is null and t.user.id = :userId")
+    Page<Task> findAllParentTasksWithChecklistItems(Integer userId, Pageable pageable);
+
 
     Page<Task> findAllByParentTask(Task parentTask, Pageable pageable);
 

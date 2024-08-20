@@ -45,12 +45,10 @@ public class TaskService {
     }
 
     public Page<Task> findAll(Integer userId, Pageable pageable) {
-        Page<Task> tasks = taskRepository.findAllByUserIdAndParentTaskIsNull(userId, pageable);
-        for (Task task : tasks) {
-            Hibernate.initialize(task.getSubtasks());
-            Hibernate.initialize(task.getChecklistItems());
-        }
-        return tasks;
+        Page<Task> tasks = taskRepository.findAllParentTasksWithSubtasks(userId, pageable);
+        return !tasks.isEmpty()
+                ? taskRepository.findAllParentTasksWithChecklistItems(userId, pageable)
+                : tasks;
     }
 
     @Transactional
