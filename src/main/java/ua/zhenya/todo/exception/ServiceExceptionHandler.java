@@ -39,13 +39,13 @@ public class ServiceExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> handleEntityNotFoundException(BadCredentialsException e) {
-        return new ResponseEntity<>(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<?> handleEntityNotFoundException(AccessDeniedException e) {
         String exception = "У вас нет доступа к этому ресурсу!";
-        return new ResponseEntity<>(new ErrorResponse(HttpStatus.NOT_FOUND.value(), exception), HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(new ErrorResponse(HttpStatus.FORBIDDEN.value(), exception), HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
