@@ -115,7 +115,7 @@ public class ProjectService {
     public Project setDefaultPermission(String projectId, ProjectPermission defaultPermission) {
         Project project = findById(projectId);
         if (!project.isInviteUrlEnabled()) {
-            throw new IllegalStateException("DefaultPermission can only be set if inviteUrlEnabled is true.");
+            throw new IllegalArgumentException("Эта опция может быть включена только если включено приглашение по ссылке!");
         }
         project.setDefaultPermission(defaultPermission);
         return projectRepository.save(project);
@@ -125,7 +125,7 @@ public class ProjectService {
     public Project setApprovalRequired(String projectId, boolean approvalRequired) {
         Project project = findById(projectId);
         if (!project.isInviteUrlEnabled()) {
-            throw new IllegalStateException("ApprovalRequired can only be set if inviteUrlEnabled is true.");
+            throw new IllegalArgumentException("Эта опция может быть включена только если включено приглашение по ссылке!");
         }
         project.setApprovalRequired(approvalRequired);
         return projectRepository.save(project);
