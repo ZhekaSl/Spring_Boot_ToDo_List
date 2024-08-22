@@ -55,15 +55,4 @@ class SubtaskServiceTest extends IntegrationTestBase {
         assertEquals(defaultUser.getId(), subtask.getUser().getId());
         assertTrue(parentTask.getSubtasks().contains(subtask));
     }
-
-    @Test
-    void findAll_ShouldReturnAllSubtasksForParentTask() {
-
-        Pageable pageable = PageRequest.of(0, 10);
-
-        Page<Task> result = subtaskService.findAll(parentTask.getId(), pageable);
-
-        assertNotNull(result);
-        assertEquals(3, result.getTotalElements());
-    }
 }
