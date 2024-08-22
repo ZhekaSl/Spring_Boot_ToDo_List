@@ -31,13 +31,4 @@ public class SubtaskController {
         TaskResponse subtask = taskMapper.toResponse(subtaskService.create(parentTaskId, createDTO));
         return ResponseEntity.status(HttpStatus.CREATED).body(subtask);
     }
-
-    @PreAuthorize("@customSecurityExpression.canAccessTask(#parentTaskId)")
-    @GetMapping
-    public PageResponse<TaskResponse> findAll(@PathVariable Integer parentTaskId, Pageable pageable) {
-        Page<TaskResponse> page = subtaskService.findAll(parentTaskId, pageable)
-                .map(taskMapper::toResponse);
-        return PageResponse.of(page);
-    }
-
 }

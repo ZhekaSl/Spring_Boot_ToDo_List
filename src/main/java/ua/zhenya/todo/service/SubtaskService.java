@@ -34,8 +34,4 @@ public class SubtaskService {
         return taskRepository.save(subtask);
     }
 
-    public Page<Task> findAll(Integer parentTaskId, Pageable pageable) {
-        Task parentTask = taskService.findById(parentTaskId);
-        return taskRepository.findAllByParentTask(parentTask, pageable);
-    }
 }

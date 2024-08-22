@@ -23,10 +23,7 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
     @Query("select t from Task t left join fetch t.checklistItems where t.parentTask is null and t.user.id = :userId")
     Page<Task> findAllParentTasksWithChecklistItems(Integer userId, Pageable pageable);
 
-
-    Page<Task> findAllByParentTask(Task parentTask, Pageable pageable);
-
-    @EntityGraph(attributePaths = {"subtasks", "checklistItems"})
+    @EntityGraph(attributePaths = {"project", "subtasks", "checklistItems"})
     Optional<Task> findById(Integer id);
 
     @Query("SELECT t FROM Task t JOIN FETCH t.user WHERE t.completed = false AND " +
