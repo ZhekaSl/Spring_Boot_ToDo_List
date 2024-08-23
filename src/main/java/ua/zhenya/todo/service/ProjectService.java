@@ -33,6 +33,10 @@ public class ProjectService {
     public Project create(Integer userId, ProjectRequest request) {
         User user = userService.findById(userId);
 
+        if (projectRepository.existsByOwnerIdAndName(userId, request.getName())) {
+            throw new IllegalArgumentException("У вас уже есть проект с таким названием: " + request.getName());
+        }
+
         Project project = projectMapper.toEntity(request);
         user.addProject(project);
 
