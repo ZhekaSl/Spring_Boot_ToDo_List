@@ -14,4 +14,6 @@ public interface ProjectRepository extends BaseProjectRepository<Project> {
 
     @Query("SELECT p FROM Project p WHERE p.owner.id = :userId OR :userId IN (SELECT up.user.id FROM UserProject up WHERE up.project.id = p.id)")
     Page<Project> findAllByUserId(@Param("userId") Integer userId, Pageable pageable);
+
+    boolean existsByOwnerIdAndName(Integer userId, String name);
 }
