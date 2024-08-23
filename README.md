@@ -6,7 +6,7 @@ The project is regularly updated.
 
 Number of classes in the project: 110+.
 
-The application's functionality includes:
+The application's functionality includes (this is not the full functionality, but only the most interesting features):
 1. Projects:
 - Roles in the project: WRITE, READ. With WRITE, a user can perform any action on tasks. With READ, the user can only view them.
 - Invite users via email with READ or WRITE roles.
