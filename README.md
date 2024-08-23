@@ -2,7 +2,7 @@ I am pleased to present to you the Todolist application for task management.
 
 Technologies used: Java, Spring Framework (Spring Boot, Spring REST, Spring Security, Spring Data JPA), Hibernate, Maven, Liquibase, Postgres, MapStruct, FreeMarker, Swagger, JUnit, Mockito, Testcontainers, Docker.
 Authentication: JWT.
-The project is regularly updated.
+The project is regularly updated!
 
 Number of classes in the project: 110+.
 
